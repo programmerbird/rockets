@@ -46,7 +46,9 @@ setup(name='Rockets',
 	author_email='ssimasanti@gmail.com',
 	url='http://github.com/ssimasanti/rocket/',
 	scripts=['rockets/bin/rocket',],
-	requires=['Django(>=1.1.1)',],
+	install_requires=[
+		'Django>=1.1.1',
+	],
 	packages=packages,
 	data_files=data_files,
 	)
