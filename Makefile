@@ -1,10 +1,26 @@
 
-test:
+test: build/rockets.tar.gz
 	virtualenv --no-site-packages env 
 	env/bin/python setup.py install 
+
+	# make local
+	cp rockets/bin/rocket-test env/bin/rocket
+	chmod +x env/bin/rocket
+	
+	# test begin!
 	rm -rf tests
 	mkdir tests
-	cd  tests; ../env/bin/rocket init
+	cd  tests; rocket init
+	
+
+build/rockets.tar.gz:
+	find . -name "*~" -exec rm -f {} \;
+	rm -rf build/
+	mkdir -p build/
+	tar -cvvf build/rockets.tar rockets setup.py
+	gzip build/rockets.tar 
+
+
 	
 setupgit:
 	cp rockets/bin/git-post-commit .git/hooks/post-commit 

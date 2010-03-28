@@ -41,7 +41,7 @@ def clone(source, target, context={}):
 	else:
 		for root, dirs, files in os.walk(source):
 			for name in files:
-				if name[-1:] in '~':
+				if name.endswith('~'):
 					continue
 				source_path = os.path.join(root, name)
 				target_path = render(change_root(source_path))

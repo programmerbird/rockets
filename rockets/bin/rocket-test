@@ -1,12 +1,12 @@
 #!/bin/bash
 
 ROCKETDIR=`pwd`
+SCRIPTDIR=$(dirname $(dirname $(dirname $(readlink -f $0))))
 REQUIREMENTS="""
-Django==1.1.1
-Fabric==0.9.0
--e svn+https://svn.apache.org/repos/asf/incubator/libcloud/trunk@921044#egg=apache_libcloud-0.3.0-py2.6-dev_r921044
--U -e git+https://github.com/ssimasanti/rockets#egg=Rockets
+-U $SCRIPTDIR/build/rockets.tar.gz
 """
+
+
 
 while [ ! -d "$ROCKETDIR/.rockets" ] 
 do
@@ -28,7 +28,7 @@ else
 		ROCKETDIR=`pwd`
 		python -m rockets.servers.bootstrap "$ROCKETDIR"
 		
-		virtualenv --no-site-packages .rockets
+		virtualenv .rockets
 		for X in $REQUIREMENTS
 		do
 			$ROCKETDIR/.rockets/bin/pip install "$X"

@@ -11,6 +11,6 @@ except ImportError:
 if __name__ == "__main__":
 	from django.core.management import setup_environ
 	setup_environ(settings)
-	from rocket.servers.utils import execute_from_command
+	from rockets.servers.utils import execute_from_command
 	execute_from_command()
 

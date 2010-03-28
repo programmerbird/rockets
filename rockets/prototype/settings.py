@@ -8,13 +8,13 @@ DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'my
 SECRET_KEY = '{{secret}}'
 
 SERVER_DUMP_PATH = os.path.abspath(os.path.dirname(__file__))
-DATABASE_NAME = os.path.abspath(os.path.join(os.path.dirname(__file__), '.datastore')
+DATABASE_NAME = os.path.abspath(os.path.join(os.path.dirname(__file__), '.datastore'))
 ADMIN_USER = '{{user}}'
 STORE_ROOT_PASSWORD = True
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
-    'rocket.servers',
-    'rocket.keys',
-    'rocket.hostings',
+    'rockets.servers',
+    'rockets.keys',
+    'rockets.hostings',
 )
 

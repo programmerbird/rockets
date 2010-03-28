@@ -170,7 +170,7 @@ class ServerManagementUtility(ManagementUtility):
 				
 def execute_from_command():
 	try:
-		from rocket.servers.utils import ServerManagementUtility
+		from rockets.servers.utils import ServerManagementUtility
 		utility = ServerManagementUtility()
 		utility.execute()
 	except Exception, e:	
