@@ -1,16 +1,20 @@
 
-test: clean build/rockets.tar.gz
+testenv: clean build/rockets.tar.gz
 	virtualenv --no-site-packages env 
 	env/bin/python setup.py install 
+	readlink -f . > env/lib/python2.6/site-packages/rockets.pth
 
 	# make local
-	cp rockets/bin/rocket-test env/bin/rocket
+	grep -v "egg=Rocket" rockets/bin/rocket > env/bin/rocket
 	chmod +x env/bin/rocket
 	
 	# test begin!
 	rm -rf tests
 	mkdir -p tests
-	cd  tests; rocket init
+	-cd tests; rocket init
+	mkdir -p tests/.rockets/lib/python2.6/site-packages/
+	readlink -f . > tests/.rockets/lib/python2.6/site-packages/rockets.pth
+	cd tests; rocket init
 	
 fulltest: clean build/rockets.tar.gz
 	rm -rf /tmp/rockets-env 

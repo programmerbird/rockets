@@ -19,23 +19,26 @@ do
 done
 
 
-if [ ! -z $ROCKETDIR ]
+if [ -z $ROCKETDIR ]
 then
-	$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
-else
 	if [ "$1" == "init" ]
 	then
 		ROCKETDIR=`pwd`
-		
 		virtualenv --no-site-packages .rockets
 		for X in $REQUIREMENTS
 		do
 			$ROCKETDIR/.rockets/bin/pip install "$X"
 		done
-		$ROCKETDIR/.rockets/bin/python -m rockets.servers.bootstrap "$ROCKETDIR"
-		$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py syncdb 
 	else
 		echo "fatal: Not a rocket (or any of the parent directories): .rockets"
 	fi
+fi
+
+if [ "$1" == "init" ]
+then
+	$ROCKETDIR/.rockets/bin/python -m rockets.servers.bootstrap "$ROCKETDIR"
+	$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py syncdb 
+else
+	$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py $1 $2 $3 $4 $5 $6 $7 $8 $9
 fi
 
