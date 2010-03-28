@@ -1,0 +1,75 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          boatyard-{{name}}
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the boatyard-{{name}} web server
+# Description:       starts boatyard-{{name}} using start-stop-daemon
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+NAME=boatyard-{{name}}
+DESC={{name}}
+
+DAEMON=/etc/uwsgi/uwsgi26
+PIDFILE=/var/run/$NAME.pid
+SOCKFILE=/tmp/boatyard-{{name}}.sock
+DAEMON_OPTS="--processes {{options.process}} --harakiri {{options.harakiri}} {{options.additional}} --disable-logging --master \
+			--pidfile $PIDFILE \
+			--daemonize /tmp/boatyard-{{name}}.out \
+			--socket $SOCKFILE \
+			--home /home/{{user}}/deployed-apps/{{name}}/env \
+			--chmod-socket --xmlconfig /home/{{user}}/deployed-apps/{{name}}/scripts/uwsgi.conf"
+
+set -e
+
+. /lib/lsb/init-functions
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: "
+		touch $PIDFILE
+		chown -R {{user}}:{{user}} $PIDFILE
+		sudo -u {{user}} start-stop-daemon --start --quiet --pidfile $PIDFILE \
+			--exec $DAEMON -- $DAEMON_OPTS || true
+	echo "$NAME."
+	;;
+  stop)
+	echo -n "Stopping $DESC: "
+	kill -s INT `cat $PIDFILE`
+	echo "$NAME."
+	;;
+  force-reload)
+	echo -n "Force Reload $DESC: "
+	kill -s TERM `cat $PIDFILE`
+	echo "$NAME."
+	;;
+  restart)
+	echo -n "Restart $DESC: "
+	kill -s INT `cat $PIDFILE`
+	sleep 5
+	sudo -u {{user}} start-stop-daemon --start --quiet --pidfile $PIDFILE \
+		--exec $DAEMON -- $DAEMON_OPTS || true
+	echo "$NAME."
+	;;
+  reload)
+	echo -n "Reload $DESC: "
+	kill -s HUP `cat $PIDFILE`
+	echo "$NAME."
+	;;
+  status)
+	echo -n "Status $DESC: "
+	kill -s USR1 `cat $PIDFILE`
+	tail -5 /tmp/boatyard-{{name}}.out
+	echo "$NAME."
+	;;
+  *)
+	echo "Usage: $NAME {start|stop|restart|force-reload|reload|status}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

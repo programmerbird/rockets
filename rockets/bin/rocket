@@ -1,0 +1,43 @@
+#!/bin/bash
+
+ROCKETDIR=`pwd`
+
+REQUIREMENTS="""
+Django==1.1.1
+Fabric==0.9.0
+South==0.6.2
+-e svn+https://svn.apache.org/repos/asf/incubator/libcloud/trunk@921044#egg=apache_libcloud-0.3.0-py2.6-dev_r921044
+wsgiref==0.1.2
+-U -e git+https://github.com/ssimasanti/rockets#egg=Rockets
+"""
+
+while [ ! -d "$ROCKETDIR/.rockets" ] 
+do
+	if [ "$ROCKETDIR" == "/" ]
+	then
+		ROCKETDIR=""
+		break 
+	fi
+	ROCKETDIR=$(dirname "$ROCKETDIR")
+done
+
+
+if [ ! -z $ROCKETDIR ]
+then
+	$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
+else
+	if [ "$1" == "init" ]
+	then
+		ROCKETDIR=`pwd`
+		virtualenv --no-site-packages .rockets
+		for X in $REQUIREMENTS
+		do
+			$ROCKETDIR/.rockets/bin/pip install "$X"
+		done
+		python -m rockets.servers.bootstrap "$ROCKETDIR"
+		$ROCKETDIR/.rockets/bin/python manage.py syncdb 
+	else
+		echo "fatal: Not a rocket (or any of the parent directories): .rockets"
+	fi
+fi
+

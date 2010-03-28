@@ -1,0 +1,35 @@
+
+server { 
+	listen       80;
+	server_name  {{name}}.boatyardapp.com{% for alias in application.alias_set.all %} {{alias.name}}{% endfor %};
+
+	# main access log
+	access_log  /var/log/boatyard/{{name}}.access main;
+	error_log  /var/log/boatyard/{{name}}.error info;
+	
+	root /home/{{user}}/deployed-apps/{{name}}/app{{secret}};
+    
+	location /media {
+		root /home/{{user}}/deployed-apps/{{name}}/app{{secret}}/media;
+	}
+	
+	location ~* ^.+\.(mpg|avi|mp3|swf|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|txt|tar|mid|midi|wav|rtf|mpeg)$ {
+		access_log off;
+		break;
+	}
+
+	location ~* ^.+\.(jpg|jpeg|gif|png|ico|css|bmp|js)$ {
+		access_log off;
+		expires 30d;
+		break;
+	}
+
+	location  / {
+		#client_body_buffer_size 50;
+		uwsgi_pass unix:///tmp/boatyard-{{name}}.sock;
+		include /etc/uwsgi/nginx/uwsgi_params;
+	}
+	
+	
+}
+
