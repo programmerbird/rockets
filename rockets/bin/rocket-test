@@ -26,13 +26,13 @@ else
 	if [ "$1" == "init" ]
 	then
 		ROCKETDIR=`pwd`
-		python -m rockets.servers.bootstrap "$ROCKETDIR"
 		
 		virtualenv .rockets
 		for X in $REQUIREMENTS
 		do
 			$ROCKETDIR/.rockets/bin/pip install "$X"
 		done
+		$ROCKETDIR/.rockets/bin/python -m rockets.servers.bootstrap "$ROCKETDIR"
 		$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py syncdb 
 	else
 		echo "fatal: Not a rocket (or any of the parent directories): .rockets"
