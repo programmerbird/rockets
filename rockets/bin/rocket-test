@@ -2,11 +2,10 @@
 
 ROCKETDIR=`pwd`
 SCRIPTDIR=$(dirname $(dirname $(dirname $(readlink -f $0))))
+DATABASE_NAME=`ls ~/.rocket`
 REQUIREMENTS="""
 -U $SCRIPTDIR/build/rockets.tar.gz
 """
-
-
 
 while [ ! -d "$ROCKETDIR/.rockets" ] 
 do
@@ -26,13 +25,14 @@ else
 	if [ "$1" == "init" ]
 	then
 		ROCKETDIR=`pwd`
-		
 		virtualenv .rockets
 		for X in $REQUIREMENTS
 		do
 			$ROCKETDIR/.rockets/bin/pip install "$X"
 		done
+		cd $ROCKETDIR
 		$ROCKETDIR/.rockets/bin/python -m rockets.servers.bootstrap "$ROCKETDIR"
+		sed -i "s@^DATABASE_NAME\s*\=.*@DATABASE_NAME = '$DATABASE_NAME'@g" $ROCKETDIR/settings.py
 		$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py syncdb 
 	else
 		echo "fatal: Not a rocket (or any of the parent directories): .rockets"

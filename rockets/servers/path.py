@@ -13,12 +13,14 @@ def read_file(path):
 		f.close()
 		
 def _clone_file(source, target, context):
+	if source.endswith('pyc'):
+		return
 	content = read_file(source)
-	rendered_content = Template(content).render(context)
+	rendered_content = Template(unicode(content)).render(context)
 	ensure_path(os.path.dirname(target))
 	f = open(target, 'w')
 	try:
-		f.write(rendered_content)
+		f.write(unicode(rendered_content))
 	finally:
 		f.close()
 

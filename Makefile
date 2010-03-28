@@ -22,6 +22,7 @@ fulltest: clean build/rockets.tar.gz
 
 build/rockets.tar.gz:
 	find . -name "*~" -exec rm -f {} \;
+	find . -name "*.pyc" -exec rm -f {} \;
 	rm -rf build/
 	mkdir -p build/
 	tar -cvvf build/rockets.tar rockets setup.py

@@ -20,7 +20,7 @@ def fullsplit(path, result=None):
 
 # Compile the list of packages available, because distutils doesn't have
 # an easy way to do this.
-packages, data_files = [], []
+packages, package_paths = [], []
 root_dir = os.path.dirname(__file__)
 if root_dir != '':
 	os.chdir(root_dir)
@@ -31,14 +31,28 @@ for dirpath, dirnames, filenames in os.walk(rockets_dir):
 	for i, dirname in enumerate(dirnames):
 		if dirname.startswith('.'): del dirnames[i]
 	if '__init__.py' in filenames:
-		packages.append('.'.join(fullsplit(dirpath)))
+		package = '.'.join(fullsplit(dirpath))
+		packages.append(package)
 	elif filenames:
-		data_files.append([dirpath, [os.path.join(dirpath, f) for f in filenames if not f.endswith('~')]])
-
+		package_paths.append(dirpath)
+		
+def find_package(dirpath):
+	chunks = fullsplit(dirpath)
+	while chunks:
+		package = '.'.join(chunks)
+		if package in packages:
+			return package
+		chunks = chunks[:-1]
+		
+package_data = {}
+for x in package_paths:
+	package = find_package(x)
+	if not package in package_data:
+		package_data[package] = []
+	package_data[package].append( x[len(package)+1:] + '/*' )
+	
 VERSION = __import__('rockets').VERSION
-
-from distutils.core import setup
-
+	
 setup(name='Rockets',
 	version=VERSION,
 	description='Cloud management tools',
@@ -46,9 +60,9 @@ setup(name='Rockets',
 	author_email='ssimasanti@gmail.com',
 	url='http://github.com/ssimasanti/rockets/',
 	scripts=['rockets/bin/rocket',],
-	install_requires=[
-		'Django>=1.1.1',
+	requires=[
+		'Django (>=1.1.1)',
 	],
 	packages=packages,
-	data_files=data_files,
+	package_data = package_data,
 	)

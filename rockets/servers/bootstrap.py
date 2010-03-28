@@ -15,10 +15,10 @@ def main():
 	
 	path = sys.argv[1]
 	user = getpass.getuser()
-	prototype_path = os.path.join(sys.prefix, 'rockets', 'prototype')
+	prototype_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../prototype'))
 	clone(prototype_path, path, {
-		'secret': os.urandom(8).encode('hex'),
-		'user': user,
+		'secret': unicode(os.urandom(32).encode('hex')),
+		'user': unicode(user),
 	})
 	open(os.path.join(path, '__init__.py'), 'w').close()
 

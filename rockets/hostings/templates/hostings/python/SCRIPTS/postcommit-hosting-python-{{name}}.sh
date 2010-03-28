@@ -27,6 +27,9 @@ fi
 
 chmod +x $GIT_PATH/hooks/post-update
 
+mkdir -p /home/{{user}}/log/{{name}}
+mkdir -p $APP_PATH/app{{secret}}
+
 touch /var/log/boatyard/{{name}}.error
 touch /var/log/boatyard/{{name}}.access
 ln -s /var/log/boatyard/{{name}}.error /home/{{user}}/log/{{name}}/error.log
