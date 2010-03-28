@@ -4,7 +4,10 @@ ROCKETDIR=`pwd`
 SCRIPTDIR=$(dirname $(dirname $(dirname $(readlink -f $0))))
 DATABASE_NAME=`ls ~/.rocket`
 REQUIREMENTS="""
--U $SCRIPTDIR/build/rockets.tar.gz
+Django==1.1.1
+Fabric==0.9.0
+-e svn+https://svn.apache.org/repos/asf/incubator/libcloud/trunk@921044#egg=apache_libcloud-0.3.0-py2.6-dev_r921044
+-I $SCRIPTDIR/build/rockets.tar.gz
 """
 
 while [ ! -d "$ROCKETDIR/.rockets" ] 
@@ -20,7 +23,7 @@ done
 
 if [ ! -z $ROCKETDIR ]
 then
-	$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
+	$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py $1 $2 $3 $4 $5 $6 $7 $8 $9
 else
 	if [ "$1" == "init" ]
 	then

@@ -9,7 +9,7 @@ test: clean build/rockets.tar.gz
 	
 	# test begin!
 	rm -rf tests
-	mkdir tests
+	mkdir -p tests
 	cd  tests; rocket init
 	
 fulltest: clean build/rockets.tar.gz
