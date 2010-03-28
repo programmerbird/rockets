@@ -9,7 +9,7 @@ test:
 setupgit:
 	cp rockets/bin/git-post-commit .git/hooks/post-commit 
 	chmod +x .git/hooks/post-commit
-	git remote add github "git@github.com:ssimasanti/rocket.git"
+	git remote add github "git@github.com:ssimasanti/rockets.git"
 	git remote add dropbox ../../Dropbox/projects/rockets/
 	echo "build/" >> .git/info/exclude 
 	echo "tests/" >> .git/info/exclude 
