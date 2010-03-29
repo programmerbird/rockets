@@ -140,5 +140,5 @@ class Command(BaseCommand):
 		uninstall_template(node, 
 			template = 'hostings/%s' % obj.kind, 
 			context=data)
-		# obj.delete()
+		obj.delete()
 
