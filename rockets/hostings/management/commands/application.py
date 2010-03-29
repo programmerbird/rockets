@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils import simplejson as json
 from rockets.servers.console import menu, new_form, edit_form
 from rockets.servers.models import Node
-from rockets.servers.path import clone
+from rockets.servers.path import install_template, uninstall_template
 from rockets.servers.api import manage
 from rockets.hostings.models import Application, APPLICATIONS, APPLICATION_MAP
 
@@ -94,12 +94,14 @@ class Command(BaseCommand):
 		except Model.DoesNotExist:
 			raise CommandError("[%s] does not exists" % name)
 			
-		source = os.path.abspath(os.path.join(__file__, '../../../templates/hostings/%s/' % obj.kind))
-		target = os.path.abspath(os.path.join(SERVER_DUMP_PATH, node.name))
 		data = dict(obj.__dict__)
-		data['application'] = obj
-		data['options'] = obj.params
-		clone(source, target, data)
+		data.update({
+			'application': obj, 
+			'options': obj.params,
+		})
+		install_template(node, 
+			template = 'hostings/%s' % obj.kind, 
+			context=data)
 			
 		
 	def mv(self, *args, **kwargs):

@@ -109,7 +109,7 @@ def new_form(form):
 		if form[x].field.initial:
 			form.values[x] = form[x].field.initial
 	for x in form.fields:
-		if form[x].field.required and not form[x].fields.initial:
+		if form[x].field.required and not form[x].field.initial:
 			edit_field(form, x)
 	return edit_form(form)
 	
