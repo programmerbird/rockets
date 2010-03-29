@@ -4,4 +4,3 @@
 rm -f /home/{{user}}/log/{{name}}/error.log
 rm -f /home/{{user}}/log/{{name}}/access.log
 
-/etc/init.d/nginx reload

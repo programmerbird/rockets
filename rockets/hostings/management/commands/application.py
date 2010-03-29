@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils import simplejson as json
 from rockets.servers.console import menu, new_form, edit_form
 from rockets.servers.models import Node
-from rockets.servers.path import install_template, uninstall_template
+from rockets.servers.template import install_template, uninstall_template
 from rockets.servers.api import manage
 from rockets.hostings.models import Application, APPLICATIONS, APPLICATION_MAP
 
