@@ -84,24 +84,29 @@ class Command(BaseCommand):
 		manage('application dump %s' % name)
 		
 	def dump(self, *args, **kwargs):
-		if len(args)!=1:
-			raise UsageError("dump <name>")
+		if not args:
+			node = Node.current()
+			for obj in Model.objects.filter(node=node):
+				manage('application dump %s' % obj.name)
+			return
+		if len(args)==1:
+			node = Node.current()
+			name = args[0]
+			try:
+				obj = Model.objects.get(node=node, name=name)
+			except Model.DoesNotExist:
+				raise CommandError("[%s] does not exists" % name)
 			
-		name = args[0]
-		node = Node.current()
-		try:
-			obj = Model.objects.get(node=node, name=name)
-		except Model.DoesNotExist:
-			raise CommandError("[%s] does not exists" % name)
-			
-		data = dict(obj.__dict__)
-		data.update({
-			'application': obj, 
-			'options': obj.params,
-		})
-		install_template(node, 
-			template = 'hostings/%s' % obj.kind, 
-			context=data)
+			data = dict(obj.__dict__)
+			data.update({
+				'application': obj, 
+				'options': obj.params,
+			})
+			install_template(node, 
+				template = 'hostings/%s' % obj.kind, 
+				context=data)
+			return
+		raise UsageError("dump <name>")
 			
 		
 	def mv(self, *args, **kwargs):

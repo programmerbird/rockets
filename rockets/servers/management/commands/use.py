@@ -29,5 +29,9 @@ class Command(BaseCommand):
 			Node.objects.get(name=name)
 			session.node = name
 		except Node.DoesNotExist:
-			raise CommandError("[%s] does not exists")
+			try:
+				Node.by_name(name)
+				session.node = name
+			except Node.DoesNotExist:
+				raise CommandError("[%s] does not exists")
 
