@@ -86,7 +86,8 @@ def dispatch_service(service_name, args):
 			raise ServiceNotInstalled("[%s] did not installed [%s]" % (node.name, service_name))
 	from api import connect
 	connect()
-			
+	
+	subcommand = 'main'
 	if args:
 		subcommand = args[0]
 		if hasattr(service, subcommand):

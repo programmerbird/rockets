@@ -111,7 +111,7 @@ class Node(models.Model):
 	storage = models.TextField(null=True, blank=True, editable=False)
 	
 	username = models.CharField(max_length=200, default='root')
-	password = models.CharField(max_length=200, null=True, blank=True, editable=False)
+	password = models.CharField(max_length=200, null=True, blank=True)
 	
 	public_ip = models.TextField(null=True, blank=True)
 	private_ip = models.TextField(null=True, blank=True)

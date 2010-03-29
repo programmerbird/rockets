@@ -17,7 +17,11 @@ ADMIN_PUBLICKEY_NAME = getattr(settings, 'ADMIN_PUBLICKEY_NAME', ADMIN_USER)
 def install(*args):
 	env.admin_user = ADMIN_USER
 	env.public_key = ADMIN_PUBLICKEY_NAME
-	manage("authorized_keys add %(public_key)s to %(admin_user)s" % env)
+	try:
+		manage("authorized_keys add %(public_key)s to %(admin_user)s" % env)
+	except:
+		pass
+	manage("authorized_keys add %(public_key)s to %(user)s" % env)
 		
 	print "Adding Boatyard Repository.."
 	append('deb http://boatyard.s3.amazonaws.com/packages/ubuntu karmic main', '/etc/apt/sources.list.d/x10studio.list')

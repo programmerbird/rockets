@@ -4,7 +4,19 @@
 import os 
 import re 
 from path import *
-				
+
+
+NUMBER_PATTERN = re.compile(r'^(\d+)\-')
+def get_script_name(node, script_name):
+	path = get_server_dump_path(node, 'SCRIPTS')
+	max_number = 0
+	for x in os.listdir(path):
+		matches = NUMBER_PATTERN.match(x)
+		if matches:
+			number = int(matches.group(1))
+			max_number = max(number+1, max_number)
+	return '%0.3d-%s' % (max_number, script_name)
+
 def find_template_path(path):
 	from django.template.loaders.app_directories import app_template_dirs
 	from django.template import TemplateDoesNotExist
@@ -42,7 +54,7 @@ def make_uninstall_script(outfile, dirs, files):
 		f.write('$RMDIR "%s"\n' % x)
 	f.close()
 	
-def dir_compare(a, b):
+def _dir_compare(a, b):
 	if a.startswith(b):
 		return -1
 	elif b.startswith(a):
@@ -58,18 +70,19 @@ def uninstall_template(node, template, context={}):
 	script_dir = os.path.join(template_path, 'SCRIPTS')
 	prerm_path = os.path.join(script_dir, 'prerm')
 	postrm_path = os.path.join(script_dir, 'postrm')
-
+	
+	# pre rm script
 	ensure_path(get_server_dump_path(node, 'SCRIPTS'))
 	if os.path.exists(prerm_path):
 		name = get_script_name(node, template_name + '_prerm')
 		clone(prerm_path, get_server_dump_path(node, 'SCRIPTS', name), context=context)
 
+	# remove dump files
 	dirs, files = get_clone_files(template_path, path, context=context, ignore_dirs=[script_dir])
 	files = [ x[len(path):] for x in files ]
 	dirs = [ x[len(path):] for x in dirs ]
-	dirs.sort(cmp=dir_compare)
+	dirs.sort(cmp=_dir_compare)
 	
-	# remove dump files
 	for x in files:
 		try:
 			os.remove(get_server_dump_path(node, x[1:]))
@@ -81,6 +94,7 @@ def uninstall_template(node, template, context={}):
 		except OSError:
 			pass 
 	
+	# rm script
 	name = get_script_name(node, template_name + '_rm')	
 	f = open(get_server_dump_path(node, 'SCRIPTS', name), 'w')
 	try:
@@ -88,6 +102,7 @@ def uninstall_template(node, template, context={}):
 	finally:
 		f.close()
 		
+	# post rm script
 	if os.path.exists(postrm_path):
 		name = get_script_name(node, template_name + '_postrm')
 		clone(postrm_path, get_server_dump_path(node, 'SCRIPTS', name), context=context)

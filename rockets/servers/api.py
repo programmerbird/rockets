@@ -21,7 +21,8 @@ def connect():
 	env.node = node 
 	env.user = node.username 
 	env.password = node.get_password()
-	env.host_string = '%s@%s' % (env.user, node.get_public_ip()[0])
+	env.host = node.get_public_ip()[0]
+	env.host_string = '%s@%s' % (env.user, env.host)
 	if env.user=='root':
 		env.home = '/root'
 	else:

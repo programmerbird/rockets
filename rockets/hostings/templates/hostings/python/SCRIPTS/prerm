@@ -1,6 +1,6 @@
 #!/bin/sh
 
 
-rm -f /home/{{user}}/log/{{name}}/error.log
-rm -f /home/{{user}}/log/{{name}}/access.log
+update-rc.d boatyard-{{name}} remove
+
 

@@ -2,7 +2,6 @@
 
 
 import os 
-import re 
 from django.template import Template, Context
 
 def read_file(path):
@@ -96,15 +95,4 @@ def get_server_dump_path(node, *args):
 	from django.conf import settings 
 	SERVER_DUMP_PATH = getattr(settings, 'SERVER_DUMP_PATH')
 	return os.path.abspath(os.path.join(SERVER_DUMP_PATH, node.name, *args))
-
-NUMBER_PATTERN = re.compile(r'^(\d+)\-')
-def get_script_name(node, script_name):
-	path = get_server_dump_path(node, 'SCRIPTS')
-	max_number = 0
-	for x in os.listdir(path):
-		matches = NUMBER_PATTERN.match(x)
-		if matches:
-			number = int(matches.group(1))
-			max_number = max(number+1, max_number)
-	return '%0.3d-%s' % (max_number, script_name)
 
