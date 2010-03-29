@@ -132,5 +132,13 @@ class Command(BaseCommand):
 			obj = Model.objects.get(node=node, name=name)
 		except Model.DoesNotExist:
 			raise CommandError("[%s] does not exists" % name)
-		obj.delete()
+		data = dict(obj.__dict__)
+		data.update({
+			'application': obj, 
+			'options': obj.params,
+		})
+		uninstall_template(node, 
+			template = 'hostings/%s' % obj.kind, 
+			context=data)
+		# obj.delete()
 
