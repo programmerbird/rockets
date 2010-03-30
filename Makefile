@@ -1,3 +1,5 @@
+version:
+	echo 'VERSION=`git describe` | sed -i "s/^VERSION\=.*$/VERSION=\'$VERSION\'/g" rockets/__init__.py' | sh
 
 testenv: clean build/rockets.tar.gz
 	virtualenv --no-site-packages env 
@@ -36,8 +38,6 @@ clean:
 	rm -rf build/
 	
 setupgit:
-	cp rockets/bin/git-pre-commit .git/hooks/pre-commit 
-	chmod +x .git/hooks/pre-commit
 	git remote add github "git@github.com:ssimasanti/rockets.git"
 	git remote add dropbox ../../Dropbox/projects/rockets/
 	echo "build/" >> .git/info/exclude 

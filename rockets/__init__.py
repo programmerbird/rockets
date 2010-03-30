@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
 # BEGIN GIT POSTCOMMIT #################################
-VERSION='0.6-11-g7be2bd7'
+VERSION='0.6-12-g281230f'
 # END GIT POSTCOMMIT ###################################
 
 def get_path():
