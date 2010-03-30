@@ -130,14 +130,7 @@ class Node(models.Model):
 		raise NotImplemented
 			
 	def get_password(self):
-		if self.password:
-			return self.password 
-		password = os.urandom(8).encode('hex')
-		self.set_password(password)
-		if STORE_ROOT_PASSWORD:
-			self.password = password 
-			self.save()
-		return password 
+		return self.password
 			
 	def get_services(self):
 		try:
