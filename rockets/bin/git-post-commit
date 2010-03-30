@@ -3,4 +3,4 @@
 # One step backward is good enough for me 
 #
 VERSION=`git describe`
-sed -i "s/^VERSION\=.*$/VERSION='$VERSION'/g" setup.py
+sed -i "s/^VERSION\=.*$/VERSION='$VERSION'/g" rockets/__init__.py
