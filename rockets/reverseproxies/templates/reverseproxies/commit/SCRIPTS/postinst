@@ -8,3 +8,13 @@ mv /etc/nginx/nginx.conf-proxy /etc/nginx/nginx.conf
 /etc/init.d/nginx start
 /etc/init.d/nginx reload
 
+
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -j DROP
+iptables -I INPUT 5 -m limit --limit 5/min -j LOG --log-prefix "iptables denied: " --log-level 7
+iptables-save
+
+

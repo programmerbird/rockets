@@ -38,18 +38,17 @@ def main(*args):
 		for node in nodes:
 			print '%-30s' % application.name, node.name
 			
-
 def add(*args):
 	node = env.node 
 	if not args:
 		for app in Application.objects.all():
 			if not Proxy.objects.filter(name=app.name):
 				Proxy.objects.get_or_create(node=node, name=app.name)
-		manage('proxy dump')
+		dump()
 		return 
 	for pattern in args:
 		Proxy.objects.get_or_create(node=node, name=pattern)
-		manage('proxy dump %s' % name)
+	dump(*args)
 
 def commit(*args):
 	node = env.node
@@ -80,5 +79,5 @@ def dump(*args):
 		install_template(node, 
 			template = 'reverseproxies/app', 
 			context=data)
-	manage('proxy commit')
+	commit()
 		
