@@ -89,7 +89,7 @@ then
 	
 	if [ -f "$APP_PATH/app{{secret}}/requirements.ini" ]
 	then 
-		$APP_PATH/env/bin/pip install -r "$APP_PATH/app{{secret}}/requirements.ini"
+		$APP_PATH/env/bin/pip install -r "$APP_PATH/app{{secret}}/requirements.ini" | sed "s@$APP_PATH/app{{secret}}/@@g"
 	fi
 	/etc/init.d/boatyard-{{name}} reload
 fi
