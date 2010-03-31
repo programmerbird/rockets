@@ -27,6 +27,10 @@ def connect():
 		env.home = '/root'
 	else:
 		env.home = '/home/%s' % env.user 
+	try:
+		local('grep "%(host)s" ~/.ssh/known_hosts' % env)
+	except:
+		local('ssh-keyscan -t rsa "%(host)s" >> ~/.ssh/known_hosts' % env)
 	
 
 

@@ -1,7 +1,11 @@
 
 server { 
 	listen       80;
-	server_name  {{name}}.boatyardapp.com{% for alias in application.alias_set.all %} {{alias.name}}{% endfor %};
+	{% with application.alias_set.all as domains %}
+	{% if domains %}
+	server_name  {% for domain in domains %} {{domain.name}}{% endfor %};
+	{% endif %}
+	{% endwith %}
 
 	# main access log
 	access_log  /var/log/boatyard/{{name}}.access main;

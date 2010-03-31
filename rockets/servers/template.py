@@ -30,7 +30,8 @@ def install_template(node, template, context={}):
 	path = get_server_dump_path(node)
 	template_name = template.replace(os.sep, '_')
 	template_path = find_template_path(template)
-	
+	if not os.path.exists(template_path):
+		return
 	script_dir = os.path.join(template_path, 'SCRIPTS')
 	postinst_path = os.path.join(script_dir, 'postinst')
 	
@@ -66,6 +67,8 @@ def uninstall_template(node, template, context={}):
 	path = get_server_dump_path(node)
 	template_name = template.replace(os.sep, '_')
 	template_path = find_template_path(template)
+	if not os.path.exists(template_path):
+		return
 
 	script_dir = os.path.join(template_path, 'SCRIPTS')
 	prerm_path = os.path.join(script_dir, 'prerm')

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+touch /var/log/boatyard/{{name}}.access
+chown www-data:www-data /var/log/boatyard/{{name}}.*
+

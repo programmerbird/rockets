@@ -41,6 +41,6 @@ then
 	$ROCKETDIR/.rockets/bin/python -m rockets.servers.bootstrap "$ROCKETDIR"
 	$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py syncdb 
 else
-	$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py $1 $2 $3 $4 $5 $6 $7 $8 $9
+	$ROCKETDIR/.rockets/bin/python $ROCKETDIR/manage.py $*
 fi
 

@@ -21,7 +21,6 @@ def install(*args):
 		manage("authorized_keys add %(public_key)s to %(admin_user)s" % env)
 	except:
 		pass
-	manage("authorized_keys add %(public_key)s to %(user)s" % env)
 		
 	print "Adding Boatyard Repository.."
 	append('deb http://boatyard.s3.amazonaws.com/packages/ubuntu karmic main', '/etc/apt/sources.list.d/x10studio.list')
@@ -30,5 +29,4 @@ def install(*args):
 	
 	print "Updating server.."
 	run('aptitude update', pty=True)
-	run('aptitude -y safe-upgrade', pty=True)
 	

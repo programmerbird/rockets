@@ -6,6 +6,8 @@ from django.db.models.query_utils import CollectedObjects
 from django.core.management.base import NoArgsCommand, BaseCommand, CommandError
 from django.conf import settings
 from django.utils import simplejson as json
+from django.template import TemplateDoesNotExist
+
 from rockets.servers.console import menu, new_form, edit_form
 from rockets.servers.models import Node
 from rockets.servers.template import install_template, uninstall_template
@@ -68,7 +70,7 @@ class Command(BaseCommand):
 		print "Please select driver below:"
 		form_class = menu([
 			(x, x.Meta.name) for x in APPLICATIONS 
-		])
+		], null=False)
 		class UserForm(form_class):
 			user = forms.CharField()
 		form = new_form(UserForm())
@@ -102,9 +104,12 @@ class Command(BaseCommand):
 				'application': obj, 
 				'options': obj.params,
 			})
-			install_template(node, 
-				template = 'hostings/%s' % obj.kind, 
-				context=data)
+			try:
+				install_template(node, 
+					template = 'hostings/%s' % obj.kind, 
+					context=data)
+			except TemplateDoesNotExist:
+				pass
 			return
 		raise UsageError("dump <name>")
 			
@@ -142,8 +147,11 @@ class Command(BaseCommand):
 			'application': obj, 
 			'options': obj.params,
 		})
-		uninstall_template(node, 
-			template = 'hostings/%s' % obj.kind, 
-			context=data)
+		try:
+			uninstall_template(node, 
+				template = 'hostings/%s' % obj.kind, 
+				context=data)
+		except TemplateDoesNotExist:
+			pass
 		obj.delete()
 

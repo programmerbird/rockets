@@ -32,27 +32,24 @@ class Command(BaseCommand):
 		node = Node.current()
 		if not args:
 			for x in Model.objects.filter(application__node=node).order_by('application__name', 'name'):
-				print unicode(x.application), '-', unicode(x)
+				print '%-40s' % unicode(x), unicode(x.application)
 			return 
 				
 	def add(self, *args, **kwargs):
-		if len(args)!=2:
+		if len(args)<2:
 			raise UsageError("add <application> <domain>")
 			
 		node = Node.current()
 		app_name = args[0]
-		name = args[1]
-		try:
-			application = Application.objects.get(name=app_name)
-		except Application.DoesNotExist:
-			raise CommandError("Unknown application [%s]" % app_name)
-		if Model.objects.filter(application__node=node, name=name):
-			raise CommandError("[%s] already existed" % name)
+		for name in args[1:]:
+			try:
+				application = Application.objects.get(name=app_name)
+			except Application.DoesNotExist:
+				raise CommandError("Unknown application [%s]" % app_name)
+			if Model.objects.filter(application__node=node, name=name).exclude(application=application):
+				raise CommandError("[%s] already existed" % name)
 			
-		n = Model()	
-		n.application = application 
-		n.name = name 
-		n.save()
+			Model.objects.get_or_create(application=application, name=name)	
 		
 		manage('application dump %s' % app_name)
 		

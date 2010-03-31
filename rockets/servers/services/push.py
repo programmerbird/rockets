@@ -44,14 +44,16 @@ def _run_scripts(node):
 		return
 	try:
 		with hide('running', 'stdout'):
-			run('chmod +X /SCRIPTS/*', pty=True)
-			for s in os.listdir(script_dir):
+			run('chmod +x /SCRIPTS/*', pty=True)
+			scripts = os.listdir(script_dir)
+			scripts.sort()
+			for s in scripts:
 				script_path = os.path.join(script_dir, s)
 				if not os.path.isfile(script_path):
 					continue
 				if script_path.endswith('~'):
 					continue
-				print "[%(host_string)s] deploy:" % env, s
+				print "[%(host_string)s] run:" % env, s
 				remote_path = '/SCRIPTS/%s' % s 
 				with show('stdout'):
 					run(remote_path, pty=True)

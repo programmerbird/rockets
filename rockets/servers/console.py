@@ -80,7 +80,9 @@ def get_form_display_value(form, field_name):
 
 
 def menu(items, ask='Enter a number to select or press ENTER to continue:', null=True):
-	if len(items)==1:
+	if not items:
+		return None
+	if len(items)==1 and not null:
 		return items[0][0]
 	while True:
 		print '' 
