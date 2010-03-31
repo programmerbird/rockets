@@ -12,8 +12,6 @@ from rockets.servers.api import *
 from rockets.keys.models import PublicKey
 		
 def add(*args):
-	connect()
-	
 	if len(args) not in (1,3):
 		raise AttributeError
 	keyname = args[0]

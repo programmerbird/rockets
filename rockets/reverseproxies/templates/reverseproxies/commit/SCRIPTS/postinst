@@ -1,2 +1,10 @@
 
+NAME=`date '+%Y%m%d'`
+ID=`ls -al /etc/nginx/nginx.conf.bckup-$NAME.* | wc -l`
+
+mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bckup-$NAME.$ID
+mv /etc/nginx/nginx.conf-proxy /etc/nginx/nginx.conf 
+
+/etc/init.d/nginx start
 /etc/init.d/nginx reload
+

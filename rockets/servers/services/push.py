@@ -42,6 +42,7 @@ def _run_scripts(node):
 	script_dir = get_server_dump_path(node, 'SCRIPTS')
 	if not os.path.exists(script_dir):
 		return
+	scripts = []
 	try:
 		with hide('running', 'stdout'):
 			run('chmod +x /SCRIPTS/*', pty=True)
@@ -61,9 +62,7 @@ def _run_scripts(node):
 	finally:
 		print "[%(host_string)s] clean" % env
 		with hide('running', 'stdout', 'stderr'):
-			for s in os.listdir(script_dir):
-				remote_path = '/SCRIPTS/%s' % s 
-				run('rm -f %s' % remote_path, pty=True)
+			run('rm -f %s ' % (' '.join(['/SCRIPTS/%s' % s for s in scripts ])), pty=True)
 			run('rmdir --ignore-fail-on-non-empty /SCRIPTS' % env, pty=True)
 			try:
 				os.rmdir(script_dir)

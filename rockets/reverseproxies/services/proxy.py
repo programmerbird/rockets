@@ -51,6 +51,11 @@ def add(*args):
 		Proxy.objects.get_or_create(node=node, name=pattern)
 		manage('proxy dump %s' % name)
 
+def commit(*args):
+	node = env.node
+	install_template(node, 
+		template = 'reverseproxies/commit')
+
 def dump(*args):
 	node = env.node 
 	proxies = Proxy.objects.filter(node=node)
@@ -75,6 +80,5 @@ def dump(*args):
 		install_template(node, 
 			template = 'reverseproxies/app', 
 			context=data)
-	install_template(node, 
-		template = 'reverseproxies/commit')
+	manage('proxy commit')
 		

@@ -18,6 +18,7 @@ def install(*args):
 	env.admin_user = ADMIN_USER
 	env.public_key = ADMIN_PUBLICKEY_NAME
 	try:
+		manage("authorized_keys add %(public_key)s to %(user)s" % env)
 		manage("authorized_keys add %(public_key)s to %(admin_user)s" % env)
 	except:
 		pass
