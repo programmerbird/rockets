@@ -1,15 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 
 
 GIT_PATH=/home/{{user}}/{{name}}.git
 APP_PATH=/home/{{user}}/deployed-apps/{{name}}
 
-if [ ! -d /home/{{user}} ]
+if [ -z `grep "^{{user}}:" /etc/passwd` ]
 then
 	yes '' | adduser --home /home/{{user}} --disabled-password {{user}}
 	
 	mkdir -p /home/{{user}}
 	chown -R {{user}}:{{user}} /home/{{user}}
+	usermod -a -G boatyard {{user}}
+	usermod -a -G {{user}} www-data
 fi
 
 if [ ! -d "$APP_PATH/env" ]
@@ -19,12 +21,17 @@ fi
 
 if [ ! -f "$GIT_PATH/HEAD" ]
 then
-	cd "$GIT_PATH"
 	mv $GIT_PATH/hooks/post-update /tmp/{{random}}.git-post-update
+	mkdir -p $GIT_PATH
+	cd $GIT_PATH
 	git init --bare
+	git config core.worktree $APP_PATH/app{{secret}}
+	git config core.bare false 
+	git config receive.denycurrentbranch ignore
 	mv /tmp/{{random}}.git-post-update $GIT_PATH/hooks/post-update
 fi
 
+chmod +x /etc/init.d/boatyard-{{name}}
 chmod +x $GIT_PATH/hooks/post-update
 
 mkdir -p /home/{{user}}/log/{{name}}
@@ -42,3 +49,5 @@ chown {{user}}:{{user}} /var/log/boatyard/{{name}}.*
 update-rc.d boatyard-{{name}} defaults
 
 /etc/init.d/nginx reload
+/etc/init.d/boatyard-{{name}} start 
+

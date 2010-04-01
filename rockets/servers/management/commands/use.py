@@ -33,5 +33,5 @@ class Command(BaseCommand):
 				Node.by_name(name)
 				session.node = name
 			except Node.DoesNotExist:
-				raise CommandError("[%s] does not exists")
+				raise CommandError("[%s] does not exists" % name)
 

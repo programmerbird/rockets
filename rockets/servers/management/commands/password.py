@@ -14,7 +14,8 @@ class Command(BaseCommand):
 		node = Node.current()
 		
 		password = node.password or os.urandom(8).encode('hex')
-		node.password = prompt('New Password', default=password)
+		if not '--random' in args:
+			node.password = prompt('New Password', default=password)
 		node.set_password(node.password)
 		node.save()
 

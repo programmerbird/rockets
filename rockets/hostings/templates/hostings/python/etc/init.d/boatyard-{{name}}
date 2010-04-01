@@ -11,16 +11,15 @@
 ### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-NAME=boatyard-{{name}}
 DESC={{name}}
 
 DAEMON=/etc/uwsgi/uwsgi26
-PIDFILE=/var/run/$NAME.pid
+PIDFILE=/var/run/boatyard-{{name}}.pid
 SOCKFILE=/tmp/boatyard-{{name}}.sock
 DAEMON_OPTS="--processes {{options.process}} --harakiri {{options.harakiri}} {{options.additional}} --disable-logging --master \
-			--pidfile $PIDFILE \
+			--pidfile /var/run/boatyard-{{name}}.pid \
 			--daemonize /tmp/boatyard-{{name}}.out \
-			--socket $SOCKFILE \
+			--socket tmp/boatyard-{{name}}.sock \
 			--home /home/{{user}}/deployed-apps/{{name}}/env \
 			--chmod-socket --xmlconfig /home/{{user}}/deployed-apps/{{name}}/scripts/uwsgi.conf"
 
@@ -28,46 +27,76 @@ set -e
 
 . /lib/lsb/init-functions
 
+RUNUSER=`id -nu`
+if [ "$RUNUSER" = "{{user}}" ] 
+then
+	SUDO=
+else
+	SUDO="sudo -u {{user}}"
+fi
+
+touch $PIDFILE
+chown -R {{user}}:{{user}} $PIDFILE
+APPPID=`cat $PIDFILE`
+
 case "$1" in
   start)
 	echo -n "Starting $DESC: "
-		touch $PIDFILE
-		chown -R {{user}}:{{user}} $PIDFILE
-		sudo -u {{user}} start-stop-daemon --start --quiet --pidfile $PIDFILE \
+		$SUDO start-stop-daemon --start --quiet --pidfile $PIDFILE \
 			--exec $DAEMON -- $DAEMON_OPTS || true
-	echo "$NAME."
+	echo "boatyard-{{name}}."
 	;;
   stop)
 	echo -n "Stopping $DESC: "
-	kill -s INT `cat $PIDFILE`
-	echo "$NAME."
+	if [ ! -z "$APPPID" ]
+	then 
+		kill -s INT $APPPID
+	fi
+	echo "boatyard-{{name}}."
 	;;
   force-reload)
 	echo -n "Force Reload $DESC: "
-	kill -s TERM `cat $PIDFILE`
-	echo "$NAME."
+	if [ ! -z "$APPPID" ]
+	then 
+		kill -s TERM $APPPID
+	else
+		$SUDO start-stop-daemon --start --quiet --pidfile $PIDFILE \
+			--exec $DAEMON -- $DAEMON_OPTS || true
+	fi
+	echo "boatyard-{{name}}."
 	;;
   restart)
 	echo -n "Restart $DESC: "
-	kill -s INT `cat $PIDFILE`
+	if [ ! -z "$APPPID" ]
+	then 
+		kill -s INT $APPPID
+	fi
 	sleep 5
-	sudo -u {{user}} start-stop-daemon --start --quiet --pidfile $PIDFILE \
+	$SUDO start-stop-daemon --start --quiet --pidfile $PIDFILE \
 		--exec $DAEMON -- $DAEMON_OPTS || true
-	echo "$NAME."
+	echo "boatyard-{{name}}."
 	;;
   reload)
 	echo -n "Reload $DESC: "
-	kill -s HUP `cat $PIDFILE`
-	echo "$NAME."
+	if [ ! -z "$APPPID" ]
+	then 
+		kill -s HUP $APPPID
+	fi
+	$SUDO start-stop-daemon --start --quiet --pidfile $PIDFILE \
+		--exec $DAEMON -- $DAEMON_OPTS || true
+	echo "boatyard-{{name}}."
 	;;
   status)
 	echo -n "Status $DESC: "
-	kill -s USR1 `cat $PIDFILE`
+	if [ ! -z "$APPPID" ]
+	then 
+		kill -s USR1 $APPPID
+	fi
 	tail -5 /tmp/boatyard-{{name}}.out
-	echo "$NAME."
+	echo "boatyard-{{name}}."
 	;;
   *)
-	echo "Usage: $NAME {start|stop|restart|force-reload|reload|status}" >&2
+	echo "Usage: boatyard-{{name}} {start|stop|restart|force-reload|reload|status}" >&2
 	exit 1
 	;;
 esac

@@ -107,7 +107,7 @@ class NoNodeSelected(Exception):
 class Node(models.Model):
 	name = models.CharField(max_length=200)
 	provider = models.ForeignKey(Provider, null=True, editable=False)
-	services = models.TextField(null=True, blank=True, editable=False)
+	services = models.TextField(null=True, blank=True)
 	storage = models.TextField(null=True, blank=True, editable=False)
 	
 	username = models.CharField(max_length=200, default='root')

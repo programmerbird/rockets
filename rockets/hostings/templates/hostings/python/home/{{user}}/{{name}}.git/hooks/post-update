@@ -14,9 +14,8 @@
 git-update-server-info
 
 is_bare=$(git-config --get --bool core.bare)
-is_bare="false"
-
 APP_PATH=/home/{{user}}/deployed-apps/{{name}}
+
 
 if [ -z "$is_bare" ]
 then
@@ -27,12 +26,6 @@ fi
 
 update_wc() {
 	ref=$1
-	echo "Push to checked out branch $ref" >&2
-	if [ ! -f $GIT_DIR/logs/HEAD ]
-	then
-		echo "E:push to non-bare repository requires a HEAD reflog" >&2
-		exit 1
-	fi
 	if (cd $GIT_WORK_TREE; git-diff-files -q --exit-code >/dev/null)
 	then
 		wc_dirty=0
@@ -77,7 +70,7 @@ if [ "$is_bare" = "false" ]
 then
 	active_branch=`git-symbolic-ref HEAD`
 	export GIT_DIR=$(cd $GIT_DIR; pwd)
-	GIT_WORK_TREE=${GIT_WORK_TREE-$APP_PATH/app{{secret}}}
+	GIT_WORK_TREE=${GIT_WORK_TREE-..}
 	for ref
 	do
 		if [ "$ref" = "$active_branch" ]
@@ -85,13 +78,16 @@ then
 			update_wc $ref
 		fi
 	done
-	
-	
-	if [ -f "$APP_PATH/app{{secret}}/requirements.ini" ]
-	then 
-		$APP_PATH/env/bin/pip install -r "$APP_PATH/app{{secret}}/requirements.ini" | sed "s@$APP_PATH/app{{secret}}/@@g" | sed "s@$APP_PATH/env/@@g"
-	fi
-	/etc/init.d/boatyard-{{name}} reload
 fi
+
+
+echo "Checking requirements.ini" >&2
+if [ -f "$APP_PATH/app{{secret}}/requirements.ini" ]
+then 
+	$APP_PATH/env/bin/pip install -r "$APP_PATH/app{{secret}}/requirements.ini" | sed "s@$APP_PATH/app{{secret}}/@@g" | sed "s@$APP_PATH/env/@@g"
+fi
+
+echo "Reload server" >&2
+/etc/init.d/boatyard-{{name}} reload
 
 

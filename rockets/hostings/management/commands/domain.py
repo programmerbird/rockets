@@ -43,7 +43,7 @@ class Command(BaseCommand):
 		app_name = args[0]
 		for name in args[1:]:
 			try:
-				application = Application.objects.get(name=app_name)
+				application = Application.objects.get(node=node, name=app_name)
 			except Application.DoesNotExist:
 				raise CommandError("Unknown application [%s]" % app_name)
 			if Model.objects.filter(application__node=node, name=name).exclude(application=application):

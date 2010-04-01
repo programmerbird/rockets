@@ -102,7 +102,7 @@ class Command(BaseCommand):
 			data = dict(obj.__dict__)
 			data.update({
 				'application': obj, 
-				'options': obj.params,
+				'options': obj.params(),
 			})
 			try:
 				install_template(node, 

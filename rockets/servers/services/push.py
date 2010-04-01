@@ -16,7 +16,7 @@ def _scp_dir(local_dir=None, remote_dir=None, exclude=[]):
 			secret = env.secret
 			local('cd "%(local_dir)s"; tar -cvzf /tmp/deploy-%(secret)s.tar.gz *' % locals())
 			put('/tmp/deploy-%(secret)s.tar.gz' % env, '/tmp/deploy-%(secret)s.tar.gz' % env)
-			run('tar -xzf /tmp/deploy-%(secret)s.tar.gz --directory=%(remote_dir)s' % locals(), pty=True)
+			run('tar -xzf /tmp/deploy-%(secret)s.tar.gz --no-overwrite-dir --directory=%(remote_dir)s' % locals(), pty=True)
 		finally:
 			local('rm /tmp/deploy-%(secret)s.tar.gz' % env)
 			run('rm /tmp/deploy-%(secret)s.tar.gz' % env, pty=True)
