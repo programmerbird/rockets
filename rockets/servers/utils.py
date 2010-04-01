@@ -1,5 +1,6 @@
 #-*- coding:utf-8 -*-
 from django.core.management import *
+from django.core.management.base import NoArgsCommand, BaseCommand, CommandError
 from django.db.models import get_apps
 import os 
 
