@@ -44,11 +44,11 @@ Add public key
 
 	pip install -r http://github.com/ssimasanti/rockets/raw/master/setup.ini
 
-Start the working environment 
+Start a working environment 
 	mkdir workingenv
 	cd workingenv/
 	
 	rocket init 
 
 ## Create your own server template
-	Coming soon..
+Coming soon..
