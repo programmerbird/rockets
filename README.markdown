@@ -1,4 +1,4 @@
-== What this project is all about ==
+## What this project is all about
 	rocket use rackspaceserver1
 
 	rocket install pythonweb
@@ -10,7 +10,7 @@
 	git push ssh://hellouser@rackspaceserver1/~/helloproject master 
 	
 	
-== Usage ==
+## Usage
 Add Cloud Provider 
 	rocket provider add rackspaceaccount1 
 
@@ -40,7 +40,7 @@ Add public key
 	rocket authorized_keys add bird to root 
 	rocket authorized_keys add bird to hellouser 
 	
-== Installation ==
+## Installation
 
 	pip install -r http://github.com/ssimasanti/rockets/raw/master/setup.ini
 
@@ -50,5 +50,5 @@ Start the working environment
 	
 	rocket init 
 
-== Create your own server template ==
+## Create your own server template
 	Coming soon..
