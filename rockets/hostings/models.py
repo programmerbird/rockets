@@ -24,7 +24,7 @@ class PhpApplication(forms.Form):
 
 APPLICATIONS = (
 	PythonApplication,
-	PhpApplication,
+#	PhpApplication,
 )
 APPLICATION_KINDS = [ (x.Meta.name, x.Meta.name) for x in APPLICATIONS ]
 APPLICATION_MAP = dict([ (x.Meta.name, x) for x in APPLICATIONS ])

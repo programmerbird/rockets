@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 
-from django.core.management.base import NoArgsCommand, BaseCommand
+from django.core.management.base import NoArgsCommand, BaseCommand, CommandError
 from django.db.models.query_utils import CollectedObjects
 from django import forms
 from rockets.servers.console import menu, new_form, edit_form
