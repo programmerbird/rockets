@@ -49,5 +49,5 @@ chown {{user}}:{{user}} /var/log/boatyard/{{name}}.*
 update-rc.d boatyard-{{name}} defaults
 
 /etc/init.d/nginx reload
-/etc/init.d/boatyard-{{name}} start 
+/etc/init.d/boatyard-{{name}} restart 
 
