@@ -10,8 +10,8 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 
 class PythonApplication(forms.Form):
-	process = forms.IntegerField(initial=6)
-	harakiri = forms.IntegerField(initial=6)
+	process = forms.IntegerField(initial=4)
+	harakiri = forms.IntegerField(initial=20)
 	additional = forms.CharField(initial='', required=False)
 	
 	django_settings = forms.CharField(initial='settings_boatyard')
