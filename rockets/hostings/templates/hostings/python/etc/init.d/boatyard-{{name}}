@@ -50,7 +50,7 @@ case "$1" in
 	echo -n "Stopping $DESC: "
 	if [ ! -z "$APPPID" ]
 	then 
-		kill -s INT $APPPID
+		kill -s INT $APPPID || true
 	fi
 	echo "boatyard-{{name}}."
 	;;
@@ -58,7 +58,7 @@ case "$1" in
 	echo -n "Force Reload $DESC: "
 	if [ ! -z "$APPPID" ]
 	then 
-		kill -s TERM $APPPID
+		kill -s TERM $APPPID || true
 	else
 		$SUDO start-stop-daemon --start --quiet --pidfile $PIDFILE \
 			--exec $DAEMON -- $DAEMON_OPTS || true
@@ -69,7 +69,7 @@ case "$1" in
 	echo -n "Restart $DESC: "
 	if [ ! -z "$APPPID" ]
 	then 
-		kill -s INT $APPPID
+		kill -s INT $APPPID || true
 	fi
 	sleep 5
 	$SUDO start-stop-daemon --start --quiet --pidfile $PIDFILE \
@@ -80,7 +80,7 @@ case "$1" in
 	echo -n "Reload $DESC: "
 	if [ ! -z "$APPPID" ]
 	then 
-		kill -s HUP $APPPID
+		kill -s HUP $APPPID || true
 	fi
 	$SUDO start-stop-daemon --start --quiet --pidfile $PIDFILE \
 		--exec $DAEMON -- $DAEMON_OPTS || true
@@ -90,7 +90,7 @@ case "$1" in
 	echo -n "Status $DESC: "
 	if [ ! -z "$APPPID" ]
 	then 
-		kill -s USR1 $APPPID
+		kill -s USR1 $APPPID || true
 	fi
 	tail -5 /tmp/boatyard-{{name}}.out
 	echo "boatyard-{{name}}."
