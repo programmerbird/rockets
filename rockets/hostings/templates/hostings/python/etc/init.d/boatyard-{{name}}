@@ -76,7 +76,7 @@ case "$1" in
 	$SUDO start-stop-daemon --start --quiet \
 		--pidfile $PIDFILE \
 		--exec $DAEMON -- $DAEMON_OPTS || true
-	echo "boatyard-testapp."
+	echo "boatyard-{{name}}."
 	;;
   status)
 	echo -n "Status $DESC: "
