@@ -38,11 +38,11 @@ fi
 case "$1" in
   start)
 	echo -n "Starting $DESC: "
+	touch $PIDFILE
+	chown -R {{user}}:{{user}} $PIDFILE
 	$SUDO start-stop-daemon --start --quiet \
 		--pidfile $PIDFILE \
 		--exec $DAEMON -- $DAEMON_OPTS || true
-	touch $PIDFILE
-	chown -R {{user}}:{{user}} $PIDFILE
 	echo "boatyard-{{name}}."
 	;;
   stop)
