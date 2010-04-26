@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+GIT_PATH=/home/{{user}}/{{name}}.git
+APP_PATH=/home/{{user}}/deployed-apps/{{name}}
+
+if [ -z `grep "^{{user}}:" /etc/passwd` ]
+then
+	yes '' | adduser --home /home/{{user}} --disabled-password {{user}}
+	
+	mkdir -p /home/{{user}}
+	chown -R {{user}}:{{user}} /home/{{user}}
+	usermod -a -G boatyard {{user}}
+	usermod -a -G {{user}} www-data
+fi
+
+chmod +x /etc/init.d/boatyard-{{name}}
+
+mkdir -p /home/{{user}}/log/{{name}}
+mkdir -p $APP_PATH/app{{secret}}
+
+touch /var/log/boatyard/{{name}}.error
+touch /var/log/boatyard/{{name}}.access
+ln -s /var/log/boatyard/{{name}}.error /home/{{user}}/log/{{name}}/error.log
+ln -s /var/log/boatyard/{{name}}.access /home/{{user}}/log/{{name}}/access.log
+
+chown -R {{user}}:{{user}} $APP_PATH
+chown {{user}}:{{user}} /var/log/boatyard/{{name}}.*
+
+/etc/init.d/nginx reload

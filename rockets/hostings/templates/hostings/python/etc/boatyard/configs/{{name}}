@@ -17,12 +17,12 @@ server {
 		root /home/{{user}}/deployed-apps/{{name}}/app{{secret}}/media;
 	}
 	
-	location ~* ^.+\.(mpg|avi|mp3|swf|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|txt|tar|mid|midi|wav|rtf|mpeg)$ {
+	location ~* ^/media/.+\.(mpg|avi|mp3|swf|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|txt|tar|mid|midi|wav|rtf|mpeg)$ {
 		access_log off;
 		break;
 	}
 
-	location ~* ^.+\.(jpg|jpeg|gif|png|ico|css|bmp|js)$ {
+	location ~* ^/media/.+\.(jpg|jpeg|gif|png|ico|css|bmp|js)$ {
 		access_log off;
 		expires 30d;
 		break;
