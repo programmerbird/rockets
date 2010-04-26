@@ -18,12 +18,17 @@ class PythonApplication(forms.Form):
 	class Meta:
 		name = 'python' 
 
+class MediaServerApplication(forms.Form):
+	class Meta:
+		name = 'media' 
+
 class PhpApplication(forms.Form):
 	class Meta:
 		name = 'php' 
 
 APPLICATIONS = (
 	PythonApplication,
+	MediaServerApplication,
 #	PhpApplication,
 )
 APPLICATION_KINDS = [ (x.Meta.name, x.Meta.name) for x in APPLICATIONS ]

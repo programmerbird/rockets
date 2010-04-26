@@ -83,4 +83,7 @@ def main(*args):
 		_upload_dir(path, '/')
 	if os.path.exists(script_dir):
 		_run_scripts(node)
+	if os.path.exists(path):
+		local('rm -rf "%s"' % path)
+	
 

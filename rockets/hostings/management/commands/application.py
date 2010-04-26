@@ -89,6 +89,7 @@ class Command(BaseCommand):
 		if not args:
 			node = Node.current()
 			for obj in Model.objects.filter(node=node):
+				print obj.name
 				manage('application dump %s' % obj.name)
 			return
 		if len(args)==1:

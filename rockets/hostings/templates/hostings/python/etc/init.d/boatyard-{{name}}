@@ -35,11 +35,12 @@ else
 	SUDO="sudo -u {{user}}"
 fi
 
+touch $PIDFILE
+chown -R {{user}}:{{user}} $PIDFILE
+
 case "$1" in
   start)
 	echo -n "Starting $DESC: "
-	touch $PIDFILE
-	chown -R {{user}}:{{user}} $PIDFILE
 	$SUDO start-stop-daemon --start --quiet \
 		--pidfile $PIDFILE \
 		--exec $DAEMON -- $DAEMON_OPTS || true

@@ -14,6 +14,7 @@ def read_file(path):
 def _clone_file(source, target, context):
 	if source.endswith('pyc'):
 		return
+	print "->", target
 	content = read_file(source)
 	rendered_content = Template(unicode(content)).render(context)
 	ensure_path(os.path.dirname(target))
