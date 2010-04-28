@@ -4,8 +4,8 @@ Install SSH Public Key
 
 usage: 
 
-rockets node [nodename] authorized_keys add [keyname] to [username] 
-rockets node [nodename] authorized_keys add [keyname] // username==keyname
+rocket proxy add --auto
+rocket proxy add appname
 
 """
 from rockets.servers.api import *
@@ -38,17 +38,22 @@ def main(*args):
 		for node in nodes:
 			print '%-30s' % application.name, node.name
 			
+def rm(*args):
+	node = env.node 
+	for pattern in args:
+		Proxy.objects.get(node=node, name=pattern).delete()
+		
 def add(*args):
 	node = env.node 
-	if not args:
+	if '--auto' in args:
 		for app in Application.objects.all():
 			if not Proxy.objects.filter(name=app.name):
 				Proxy.objects.get_or_create(node=node, name=app.name)
 		dump()
-		return 
-	for pattern in args:
-		Proxy.objects.get_or_create(node=node, name=pattern)
-	dump(*args)
+	else:
+		for pattern in args:
+			Proxy.objects.get_or_create(node=node, name=pattern)
+		dump(*args)
 
 def commit(*args):
 	node = env.node
