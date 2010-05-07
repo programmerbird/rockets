@@ -12,6 +12,8 @@ server {
 	error_log  /var/log/boatyard/{{name}}.error info;
 	
 	root /home/{{user}}/deployed-apps/{{name}}/app{{secret}};
+	
+	client_max_body_size 50m;
     
 	location /media {
 		root /home/{{user}}/deployed-apps/{{name}}/app{{secret}}/media;
