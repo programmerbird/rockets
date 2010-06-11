@@ -41,7 +41,19 @@ server {
 		uwsgi_pass unix:///tmp/boatyard-{{name}}.sock;
 		include /etc/uwsgi/nginx/uwsgi_params;
 	}
-	
+
+	error_page  404  /404.html;
+
+	# redirect server error pages to the static page /50x.html
+	#
+	error_page   500 502 503 504  /50x.html;
+	location = /50x.html {
+		root   /var/www/nginx-default;
+	}
+    location = /404.html {  
+        root  /var/www/nginx-default;  
+    }  
+
 	
 }
 

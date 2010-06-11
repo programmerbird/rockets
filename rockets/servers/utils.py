@@ -85,6 +85,7 @@ def dispatch_service(service_name, args):
 		node = Node.current()
 		if service_name not in node.get_services():
 			raise ServiceNotInstalled("[%s] did not installed [%s]" % (node.name, service_name))
+
 	from api import connect
 	connect()
 	
@@ -184,6 +185,6 @@ def execute_from_command():
 	except Exception, e:	
 		sys.stderr.write(bcolors.FAIL + unicode(e) + '\n' + bcolors.ENDC)
 		sys.exit(1)
-	sys.exit(0)
+	return 
 
 

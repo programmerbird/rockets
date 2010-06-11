@@ -3,6 +3,7 @@
 
 """
 import os 
+import sys
 import random
 from fabric.contrib.project import rsync_project
 from rockets.servers.api import *
@@ -85,5 +86,6 @@ def main(*args):
 		_run_scripts(node)
 	if os.path.exists(path):
 		local('rm -rf "%s"' % path)
+	sys.exit(0)
 	
 
