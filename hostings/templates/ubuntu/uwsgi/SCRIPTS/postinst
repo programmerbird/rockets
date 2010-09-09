@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+APP_PATH=/home/{{user}}/apps/{{name}}
+
+if [ -z `grep "^{{user}}:" /etc/passwd` ]
+then
+	yes '' | adduser --home /home/{{user}} --disabled-password {{user}}
+	
+	mkdir -p /home/{{user}}
+	chown -R {{user}}:{{user}} /home/{{user}}
+	usermod -a -G {{user}} www-data
+fi
+
+if [ ! -d "$APP_PATH/env" ]
+then 
+	virtualenv --no-site-packages $APP_PATH/env
+fi
+
+
+chmod +x /etc/init.d/uwsgi-{{name}}
+ln -s /etc/nginx/sites-available/{{name}} /etc/nginx/sites-enabled/{{name}}
+ln -s /var/log/www/{{name}}/ /home/{{user}}/log/{{name}}
+
+chown -R {{user}}:{{user}} $APP_PATH
+
+update-rc.d uwsgi-{{name}} defaults
+
+/etc/init.d/nginx reload
+/etc/init.d/uwsgi-{{name}} restart 
+
