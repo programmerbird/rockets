@@ -1,7 +1,7 @@
 <VirtualHost *>
 
-    ServerName localhost
-	{% if domains_list %}
+    ServerName {{name}}.localhost
+	{% if domains %}
 	ServerAlias  {% for domain in domains %} {{domain}}{% endfor %};
 	{% endif %}
 	DocumentRoot /home/{{user}}/apps/{{name}}/app{{secret}}

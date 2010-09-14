@@ -1,7 +1,7 @@
 
 server { 
 	listen       80;
-	{% if domains_list %}
+	{% if domains %}
 	server_name  {% for domain in domains %} {{domain}}{% endfor %};
 	{% endif %}
 

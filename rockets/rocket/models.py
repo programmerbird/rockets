@@ -1,0 +1,129 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+
+import json
+from django.db import models
+from django.db.models import Q, signals
+from django.conf import settings
+
+class Session(models.Model):
+	name = models.CharField(max_length=200, primary_key=True)
+	value = models.TextField()
+
+	@classmethod
+	def get(self, name, default=None):
+		try:
+			session = Session.objects.get(name=name)
+			return session.value
+		except Session.DoesNotExist:
+			return default 
+			
+class NoNodeSelected(Exception):
+	pass 
+
+class Listener(models.Model):
+	node = models.CharField(max_length=200, default='*')
+	service = models.CharField(max_length=200, default='*')
+	service_name = models.CharField(max_length=200, default='*')
+	action = models.CharField(max_length=200, default='*')
+	
+	name = models.CharField(max_length=200, primary_key=True)
+	method = models.CharField(max_length=200)
+	parameters = models.TextField(null=True, blank=True)
+	
+	@classmethod 
+	def dispatch(self, node, service, service_name, action):	
+		listeners = Listener.objects.filter(Q(node=node)|Q(node='*'))
+			.filter(Q(service=service)|Q(service='*'))
+			.filter(Q(service_name=service_name)|Q(service_name='*'))
+			.filter(Q(action=action)|Q(action='*'))
+		for listener in listeners:
+			listener.sender = node 
+			listener.sender_service = service 
+			listener.sender_service_name = service_name 
+			listener.sender_action = action
+			listener.invoke()
+	
+	def invoke(self):
+		pass 
+		
+class Node (models.Model):
+	name = models.CharField(max_length=200)
+	public_ip = models.TextField(null=True, blank=True)
+	private_ip = models.TextField(null=True, blank=True)
+	
+	provider = models.CharField(max_length=200, null=True, blank=True)
+	os = models.CharField(max_length=200, null=True, blank=True, default='ubuntu')
+	username = models.CharField(max_length=200, blank=True, default='root')
+	services = models.TextField(blank=True, default='[]')
+	storage = models.TextField(blank=True, default='{}')
+	
+	@classmethod
+	def current(self):
+		name = Session.get('node')
+		if not name:
+			raise NoNodeSelected()
+		return Node.objects.get(name=name)
+		
+	def get_storage(self):
+		try:
+			return self._storage 
+		except KeyError:
+			self._storage = s = json.loads(self.storage or '{}')
+			return s 
+			
+	def get_services(self, service):
+		try:
+			return self._services
+		except KeyError:
+			self._services = s = json.loads(self.services or '[]')
+			return s 
+			
+	def is_installed(self, service):
+		services = self.get_services()
+		return service in services 
+		
+	def install(self, service):
+		if not self.is_installed(service):
+			self.get_services().append(service)
+		
+	def remove(self, service):
+		if self.is_installed(service):
+			self.get_services().remove(service)		
+		
+	def get_services_storage(self, service):
+		storage = self.get_storage()
+		if service not in storage:
+			services_storage = storage[service] = {}
+		else:
+			services_storage = storage[service] 
+		return services_storage
+			
+	def get_service_storage(self, service, name):
+		services_storage = self.get_services_storage(service)
+		if name not in services_storage:
+			service_storage = services_storage[name] = {}
+		else:
+			service_storage = services_storage[name] = {}
+		return service_storage 
+		
+
+	def _manage_json_fields(self):
+		if hasattr(self, '_storage'):
+			self.storage = json.dumps(self._storage)
+		if hasattr(self, '_services'):
+			self.services = json.dumps(self._services)
+	
+	def _manage_ip_fields(self):
+		if self.public_ip and not self.public_ip.startswith('['):
+			self.public_ip = json.dumps([self.public_ip])
+		if self.private_ip and not self.private_ip.startswith('['):
+			self.private_ip = json.dumps([self.private_ip])
+	
+	def save(self, *args, **kwargs):
+		self._manage_json_fields()
+		self._manage_ip_fields()
+		super(Node, self).save(*args, **kwargs)
+		
+
+			
