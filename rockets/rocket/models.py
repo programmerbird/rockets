@@ -16,8 +16,16 @@ class Session(models.Model):
 			session = Session.objects.get(name=name)
 			return session.value
 		except Session.DoesNotExist:
+			if default:
+				self.store(name, default)
 			return default 
 			
+	@classmethod 
+	def store(self, name, value):
+		session, is_created = Session.objects.get_or_create(name=name)
+		session.value = value
+		session.save()
+		
 class NoNodeSelected(Exception):
 	pass 
 
@@ -85,10 +93,12 @@ class Node (models.Model):
 		
 	def install(self, service):
 		if not self.is_installed(service):
+			# install script here
 			self.get_services().append(service)
 		
 	def remove(self, service):
 		if self.is_installed(service):
+			# remove package here
 			self.get_services().remove(service)		
 		
 	def get_services_storage(self, service):
