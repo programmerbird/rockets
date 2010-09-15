@@ -21,7 +21,7 @@ DAEMON_OPTS="--processes {{options.process}} --harakiri {{options.harakiri}} {{o
 			--daemonize /dev/null \
 			--socket /tmp/uwsgi-{{name}}.sock \
 			--home /home/{{user}}/apps/{{name}}/env \
-			--chmod-socket --xmlconfig /home/{{user}}/apps/{{name}}/bin/uwsgi.conf"
+			--chmod-socket --xmlconfig /home/{{user}}/apps/{{name}}/conf/uwsgi.conf"
 
 set -e
 
