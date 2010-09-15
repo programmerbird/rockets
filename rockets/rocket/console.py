@@ -9,6 +9,7 @@ HTML_RULES = (
 	(re.compile('\&nbsp\;'), ' '),
 	(re.compile('\<.*?\>'), ''),
 )
+
 def prompt(text='', default=None):
 	text = text.strip()
 	if default:
