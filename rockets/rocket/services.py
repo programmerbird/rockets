@@ -195,4 +195,10 @@ class NodeService(Service):
 		super(NodeService, self).save(*args, **kwargs)
 		
 	def delete(self, *args, **kwargs):
+		self.dispatch('pre_remove')
+		self.uninstall_listeners()
 		self.node.delete()
+		self.uninstall()
+		self.dispatch('post_remove')
+					
+
