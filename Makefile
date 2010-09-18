@@ -1,5 +1,5 @@
 version:
-	echo 'VERSION=`git describe`; sed -i "s/^VERSION\=.*$$/VERSION=\"$${VERSION}\"/g" rockets/__init__.py' | sh
+	echo 'VERSION=`git describe --tags`; sed -i "s/^VERSION\=.*$$/VERSION=\"$${VERSION}\"/g" rockets/__init__.py' | sh
 
 testenv: clean build/rockets.tar.gz
 	virtualenv --no-site-packages env 

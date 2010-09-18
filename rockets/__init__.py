@@ -3,7 +3,7 @@
 
 
 # BEGIN GIT POSTCOMMIT #################################
-VERSION="0.6-18-g448e7f0"
+VERSION="r2"
 # END GIT POSTCOMMIT ###################################
 
 def get_path():
