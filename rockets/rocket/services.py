@@ -2,17 +2,23 @@
 #-*- coding:utf-8 -*-
 
 import json
+from django import forms
 from utils import hashdict
 from models import * 
+import console
 
 class BaseService(forms.Form):
 		
-			
 	def __init__(self, *args, **kwargs):
-		super(Service, self).__init__(*args, **kwargs)
+		super(BaseService, self).__init__(*args, **kwargs)
+		self.console = console.Console()
 		self.service_name = None
+		self.values = {}
+		self._listeners = []
 		self.listeners()
 		
+		
+	@classmethod
 	def get_name(self):
 		try:
 			return self._name 
@@ -20,8 +26,8 @@ class BaseService(forms.Form):
 			try:
 				self._name = n = self.Meta.name 
 			except:
-				n = self.__class__.__name__
-				n = full_name.lower()
+				n = self._module_name
+				n = n.lower()
 				if n.endswith('service'):
 					n = n[:(len(n)-len('service'))]
 				self._name = n 
@@ -31,19 +37,28 @@ class BaseService(forms.Form):
 		self.node.install(package)
 
 	def confirm_save(self, *args, **kwargs):
+		kind = self.get_name()
+		name = self.values.get('name', '')
 		if not kwargs.get('force'):
-			if not self.console():
-				return
+			while True:
+				result = self.console.prompt("Is the information correct? \033[0;0m[Y/n]", null=False, choices="Yyn")
+				if result in 'Yy':
+					break
+				self.console.edit_form(self)
 		self.save()
+		self.console.write('%s (%s) saved\n' % (name, kind))
 	
 	def confirm_delete(self, *args, **kwargs):
+		kind = self.get_name()
+		name = self.values.get('name', '')
 		if not kwargs.get('force'):
-			if not self.console():
+			self.console.write('You are going to remove the following item(s):\n')
+			self.console.write('  - %s (%s)\n' % (name, kind))
+			result = self.console.prompt("Are you sure you want to do this? \033[0;0m[Y/n]", null=False, choices="Yyn")
+			if result in 'n':
 				return
 		self.delete()
-		
-	def console(self):
-		return True 
+		self.console.write('%s (%s) removed\n' % (name, kind))
 		
 	def dump(self, script=None):
 		if not script:
@@ -84,6 +99,8 @@ class BaseService(forms.Form):
 		self.listeners.append(listener)
 		return listener
 			
+	class Meta:
+		abstract = True
 		
 class Service(BaseService):
 	node = None
@@ -96,6 +113,11 @@ class Service(BaseService):
 		pass
 		
 	def add(self, *args, **kwargs):
+		if args:
+			self.service_name = args[0]
+			self.values['name'] = self.service_name
+		self.values.update(kwargs)
+		self.console.new_form(self)
 		self.confirm_save(*args, **kwargs)
 		
 	# load values into self.values 
@@ -104,10 +126,17 @@ class Service(BaseService):
 		pass 
 		
 	def edit(self, *args, **kwargs):
-		self.storage.update(kwargs)
+		if args:
+			self.service_name = args[0]
+			self.values['name'] = self.service_name
+		self.values.update(kwargs)
+		self.console.edit_form(self)
 		self.confirm_save(*args, **kwargs)
 		
 	def remove(self, *args, **kwargs):
+		if args:
+			self.service_name = args[0]
+			self.values['name'] = self.service_name
 		self.confirm_delete(*args, **kwargs)
 		
 
@@ -131,6 +160,9 @@ class Service(BaseService):
 		
 	def uninstall(self):
 		pass 
+			
+	class Meta:
+		pass
 		
 def invoke(listener, class_name, node_name=None, service=None, service_name=None, method=None):
 	pass 
@@ -148,11 +180,19 @@ class NodeService(Service):
 	username = forms.CharField(required=False, initial='root')
 	
 	def add(self, *args, **kwargs):
-		self.node = node = Node(**self.values)
+		self.node = Node()
+		super(NodeService, self).add(*args, **kwargs)
 	
 	def load(self, name, *args, **kwargs):
 		self.node = node = Node.objects.get(name=name)
 		self.values = {}
 		for field in self:
-			self.values[field] = getattr(node, field)
-	
+			self.values[field.name] = getattr(node, field.name)
+			
+	def save(self, *args, **kwargs):
+		for field in self:
+			setattr(self.node, field.name, self.values[field.name])
+		super(NodeService, self).save(*args, **kwargs)
+		
+	def delete(self, *args, **kwargs):
+		self.node.delete()

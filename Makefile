@@ -1,3 +1,5 @@
+all: fulltest
+
 version:
 	echo 'VERSION=`git describe --tags`; sed -i "s/^VERSION\=.*$$/VERSION=\"$${VERSION}\"/g" rockets/__init__.py' | sh
 
@@ -7,16 +9,18 @@ testenv: clean build/rockets.tar.gz
 	readlink -f . > env/lib/python2.6/site-packages/rockets.pth
 
 	# make local
-	grep -v "egg=Rocket" rockets/bin/rocket > env/bin/rocket
-	chmod +x env/bin/rocket
+	grep -v "egg=Rocket" rockets/bin/rocket2 > env/bin/rocket2
+	chmod +x env/bin/rocket2
 	
 	# test begin!
 	rm -rf tests
 	mkdir -p tests
-	-cd tests; rocket init
+	-cd tests; rocket2 init
 	mkdir -p tests/.rockets/lib/python2.6/site-packages/
 	readlink -f . > tests/.rockets/lib/python2.6/site-packages/rockets.pth
-	cd tests; rocket init
+	
+test:
+	cd tests; rocket2 init
 	
 fulltest: clean build/rockets.tar.gz
 	rm -rf /tmp/rockets-env 
@@ -26,7 +30,7 @@ fulltest: clean build/rockets.tar.gz
 	mkdir -p /tmp/rockets-test
 	cd /tmp/rockets-test/; /tmp/rockets-env/bin/rocket init
 
-build/rockets.tar.gz:
+build/rockets.tar.gz: version
 	find . -name "*~" -exec rm -f {} \;
 	find . -name "*.pyc" -exec rm -f {} \;
 	rm -rf build/

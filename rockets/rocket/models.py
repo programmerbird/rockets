@@ -27,7 +27,8 @@ class Session(models.Model):
 		session.save()
 		
 class NoNodeSelected(Exception):
-	pass 
+	def __unicode__(self):
+		return "No node selected"
 
 class Listener(models.Model):
 	node = models.CharField(max_length=200, default='*')
@@ -41,9 +42,9 @@ class Listener(models.Model):
 	
 	@classmethod 
 	def dispatch(self, node, service, service_name, action):	
-		listeners = Listener.objects.filter(Q(node=node)|Q(node='*'))
-			.filter(Q(service=service)|Q(service='*'))
-			.filter(Q(service_name=service_name)|Q(service_name='*'))
+		listeners = Listener.objects.filter(Q(node=node)|Q(node='*')) \
+			.filter(Q(service=service)|Q(service='*')) \
+			.filter(Q(service_name=service_name)|Q(service_name='*')) \
 			.filter(Q(action=action)|Q(action='*'))
 		for listener in listeners:
 			listener.sender = node 
@@ -56,7 +57,7 @@ class Listener(models.Model):
 		pass 
 		
 class Node (models.Model):
-	name = models.CharField(max_length=200)
+	name = models.CharField(max_length=200, unique=True)
 	public_ip = models.TextField(null=True, blank=True)
 	private_ip = models.TextField(null=True, blank=True)
 	
@@ -70,7 +71,7 @@ class Node (models.Model):
 	def current(self):
 		name = Session.get('node')
 		if not name:
-			raise NoNodeSelected()
+			name = "localhost"
 		return Node.objects.get(name=name)
 		
 	def get_storage(self):
@@ -136,4 +137,5 @@ class Node (models.Model):
 		super(Node, self).save(*args, **kwargs)
 		
 
-			
+	def __unicode__(self):
+		return self.name			

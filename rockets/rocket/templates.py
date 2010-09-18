@@ -4,7 +4,6 @@
 
 
 import os, re 
-import uuid4
 from django.conf import settings 
 from django.template import Template, Context
 
@@ -55,20 +54,21 @@ def travel(source, target, context={}, ignore_dirs=[], action=None):
 				ensure_path(target_path)
 				action(source_path, target_path)
 			for name in files:
-				if is_ignore_files(name):
+				if is_ignore_file(name):
 					continue
 				source_path = os.path.join(root, name)
 				target_path = render(change_root(source_path))
 				action(source_path, target_path)
 
-def dump(source, target, context={}, ignore_dirs=[]):
+def dump(source, target, context={}, ignore_dirs=[], debug=None):
 	template_context = Context(context)
 	def dump_file(source, target):
 		if not os.path.isfile(source):
 			return 
 		if is_ignore_file(source):
 			return 
-		print "->", target
+		if debug:
+			debug(target)
 		content = read_file(source)
 		rendered_content = Template(unicode(content)).render(template_context)
 		ensure_path(os.path.dirname(target))

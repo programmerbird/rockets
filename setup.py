@@ -59,7 +59,7 @@ setup(name='Rockets',
 	author='Sittipon Simasanti',
 	author_email='ssimasanti@gmail.com',
 	url='http://github.com/ssimasanti/rockets/',
-	scripts=['rockets/bin/rocket',],
+	scripts=['rockets/bin/rocket2',],
 	requires=[
 		'Django (>=1.2.3)',
 	],

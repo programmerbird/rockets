@@ -1,0 +1,1 @@
+[{"pk": "node", "model": "rocket.session", "fields": {"value": "localhost"}}, {"pk": 1, "model": "rocket.node", "fields": {"username": "root", "name": "localhost", "storage": "{}", "public_ip": "[\"127.0.0.1\"]", "private_ip": "[\"127.0.0.1\"]", "provider": null, "services": "[]", "os": "ubuntu"}}]
