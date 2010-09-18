@@ -20,8 +20,8 @@ DAEMON_OPTS="--processes {{options.process}} --harakiri {{options.harakiri}} {{o
 			--pidfile /var/run/uwsgi-{{name}}.pid \
 			--daemonize /dev/null \
 			--socket /tmp/uwsgi-{{name}}.sock \
-			--home /home/{{user}}/apps/{{name}}/env \
-			--chmod-socket --xmlconfig /home/{{user}}/apps/{{name}}/conf/uwsgi.conf"
+			--home /home/{{name}}/env \
+			--chmod-socket --xmlconfig /home/{{name}}/conf/uwsgi.conf"
 
 set -e
 

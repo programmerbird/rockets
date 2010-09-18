@@ -9,12 +9,12 @@ server {
 	access_log  /var/log/uwsgi/{{name}}.access main;
 	error_log  /var/log/uwsgi/{{name}}.error info;
 	
-	root /home/{{user}}/apps/{{name}}/app{{secret}};
+	root /home/{{name}}/app{{secret}};
 	
 	client_max_body_size 50m;
     
 	location /media {
-		root /home/{{user}}/apps/{{name}}/app{{secret}}/media;
+		root /home/{{name}}/app{{secret}}/media;
 	}
 	
 	location ~* ^/media/.+\.(mpg|avi|mp3|swf|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|txt|tar|mid|midi|wav|rtf|mpeg)$ {

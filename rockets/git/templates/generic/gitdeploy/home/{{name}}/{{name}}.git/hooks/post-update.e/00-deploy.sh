@@ -14,7 +14,7 @@
 git-update-server-info
 
 is_bare=$(git-config --get --bool core.bare)
-APP_PATH=/home/{{user}}/apps/{{name}}
+APP_PATH=/home/{{name}}
 
 
 if [ -z "$is_bare" ]

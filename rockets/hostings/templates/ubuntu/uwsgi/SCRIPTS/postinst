@@ -1,15 +1,15 @@
 #!/bin/bash
 
 
-APP_PATH=/home/{{user}}/apps/{{name}}
+APP_PATH=/home/{{name}}
 
-if [ -z `grep "^{{user}}:" /etc/passwd` ]
+if [ -z `grep "^{{name}}:" /etc/passwd` ]
 then
-	yes '' | adduser --home /home/{{user}} --disabled-password {{user}}
+	yes '' | adduser --home /home/{{name}} --disabled-password {{name}}
 	
-	mkdir -p /home/{{user}}
-	chown -R {{user}}:{{user}} /home/{{user}}
-	usermod -a -G {{user}} www-data
+	mkdir -p /home/{{name}}
+	chown -R {{name}}:{{name}} /home/{{name}}
+	usermod -a -G {{name}} www-data
 fi
 
 if [ ! -d "$APP_PATH/env" ]
@@ -20,9 +20,9 @@ fi
 
 chmod +x /etc/init.d/uwsgi-{{name}}
 ln -s /etc/nginx/sites-available/{{name}} /etc/nginx/sites-enabled/{{name}}
-ln -s /var/log/www/{{name}}/ /home/{{user}}/log/{{name}}
+ln -s /var/log/www/{{name}} /home/{{name}}/log
 
-chown -R {{user}}:{{user}} $APP_PATH
+chown -R {{name}}:{{name}} $APP_PATH
 
 update-rc.d uwsgi-{{name}} defaults
 

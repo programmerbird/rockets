@@ -1,7 +1,7 @@
 import os,sys
 
-sys.path.append('/home/{{user}}/apps/{{name}}/app{{secret}}/')
-sys.path.append('/home/{{user}}/apps/{{name}}/')
+sys.path.append('/home/{{name}}/app{{secret}}/')
+sys.path.append('/home/{{name}}/')
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'app{{secret}}.{{options.django_settings}}'
 
