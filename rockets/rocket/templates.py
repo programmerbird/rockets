@@ -46,7 +46,12 @@ def travel(source, target, context={}, ignore_dirs=[], action=None):
 				continue
 			for name in dirs:
 				source_path = os.path.join(root, name)
-				if source_path in ignore_dirs:
+				is_ignore = False
+				for ignore_dir in ignore_dirs:
+					if source_path.startswith(ignore_dir):
+						is_ignore = True
+						break
+				if is_ignore:
 					continue
 				target_path = render(change_root(source_path))
 				ensure_path(target_path)
@@ -55,6 +60,13 @@ def travel(source, target, context={}, ignore_dirs=[], action=None):
 				if is_ignore_file(name):
 					continue
 				source_path = os.path.join(root, name)
+				is_ignore = False
+				for ignore_dir in ignore_dirs:
+					if source_path.startswith(ignore_dir):
+						is_ignore = True
+						break
+				if is_ignore:
+					continue
 				target_path = render(change_root(source_path))
 				action(source_path, target_path)
 
@@ -118,16 +130,19 @@ class Dumper(object):
 		self.template_name = self.template.replace(os.sep, '-')
 		self.template_path = find_template_path(template)
 		self.template_script_dir = os.path.join(self.template_path, 'SCRIPTS')
+		self.template_plugin_dir = os.path.join(self.template_path, 'PLUGINS')
+		self.target_script_dir = os.path.join(self.target_path, 'SCRIPTS')
 		self.context = {}
 		
 	def get_script_name(self, script):
 		result = 0
-		for x in os.listdir(self.template_script_dir):
-			matches = NUMBER_PATTERN.match(x)
-			if matches:
-				number = int(matches.group(1))
-				result = max(number+1, result) 
-		return '%0.4d-%s' % (result, script)
+		if os.path.exists(self.target_script_dir):
+			for x in os.listdir(self.target_script_dir):
+				matches = NUMBER_PATTERN.match(x)
+				if matches:
+					number = int(matches.group(1))
+					result = max(number+1, result) 
+		return '%0.3d-%s' % (result, script)
 		
 	def script(self, script):
 		base_name = os.path.basename(script)
@@ -143,7 +158,8 @@ class Dumper(object):
 			target = source 
 		template_path = os.path.join(self.template_path, source)
 		target_path = os.path.join(self.target_path, target)
-		dump(template_path, target_path, context=self.context, debug=self.debug)
+		dump(template_path, target_path, context=self.context, debug=self.debug, 
+			ignore_dirs=[self.template_plugin_dir, self.template_script_dir])
 			
 	def get_files(self, source=None, target=None):
 		if not source:
@@ -152,7 +168,8 @@ class Dumper(object):
 			target = source 
 		template_path = os.path.join(self.template_path, source)
 		target_path = os.path.join(self.target_path, target)
-		return get_files(template_path, target_path, context=self.context)
+		return get_files(template_path, target_path, context=self.context, 
+			ignore_dirs=[self.template_plugin_dir, self.template_script_dir])
 			
 def _parent_dir_compare(a, b):
 	if a.startswith(b):

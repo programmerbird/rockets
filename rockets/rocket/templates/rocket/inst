@@ -28,8 +28,7 @@ PACK_EFILE () {
 
 {% if rocket_files %}
 # files
-{% for file in rocket_files %}
-mv "/tmp/rocket-{{rocket_bundle}}/{{file}}" "{{file}}"
+{% for file in rocket_files %}mv "/tmp/rocket-{{rocket_bundle}}{{file}}" "{{file}}"
 {% endfor %}
 {% endif %}
 

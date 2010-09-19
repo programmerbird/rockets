@@ -74,7 +74,7 @@ class BaseService(forms.Form):
 		if not context:
 			context = {}
 		
-		template_context = {"node": self.node}
+		template_context = {"node": self.node, "rocket_bundle": Session.bundle()}
 		template_context.update(self.values)
 		template_context.update(context)
 		

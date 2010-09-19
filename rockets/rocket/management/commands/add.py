@@ -27,6 +27,4 @@ class Command(BaseCommand):
 				n.add(*app_args)
 			except KeyboardInterrupt:
 				self.stdout.write("\nSee ya :)\n")
-			except Exception, e:
-				raise CommandError(unicode(e))
 

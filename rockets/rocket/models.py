@@ -2,6 +2,7 @@
 #-*- coding:utf-8 -*-
 
 import json
+import uuid
 from django.db import models
 from django.db.models import Q, signals
 from django.conf import settings
@@ -25,6 +26,10 @@ class Session(models.Model):
 		session, is_created = Session.objects.get_or_create(name=name)
 		session.value = value
 		session.save()
+		
+	@classmethod
+	def bundle(self,):
+		return self.get("rocket_bundle", default=unicode(uuid.uuid4()))
 		
 class NoNodeSelected(Exception):
 	def __unicode__(self):
