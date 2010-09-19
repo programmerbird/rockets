@@ -45,5 +45,7 @@ setupgit:
 	git remote add github "git@github.com:ssimasanti/rockets.git"
 	git remote add dropbox ../../Dropbox/projects/rockets/
 	echo "build/" >> .git/info/exclude 
-	echo "tests/" >> .git/info/exclude 
-	
+	echo "tests/" >> .git/info/exclude
+	# to allow empty directory in git 
+	echo "*" >> .git/info/exclude 
+	echo "!.gitignore" >> .git/info/exclude

@@ -3,14 +3,14 @@
 
 
 from django.core.management.base import NoArgsCommand, BaseCommand, CommandError
-from rockets.rocket.models import *
-from rockets.rocket.loaders import list_services, get_service
+from rockets import models
+from rockets import loaders
 
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
 		if not args:
-			services = list_services()
+			services = loaders.list_services()
 			services.sort()
 			for service in services:
 				self.stdout.write("%s\n" % service)
@@ -19,11 +19,12 @@ class Command(BaseCommand):
 			app_args = args[1:]
 			try:
 				self.stdout.write("Adding %s ...\n" % app_name)
-				n = get_service(app_name)()
+				n = loaders.get_service(app_name)()
 				n.command = self
 				n.console.command = self
-				n.node = Node.current()
-				n.add(*app_args, **kwargs)
+				n.node = models.Node.current()
+				n.init(*app_args)
+				n.add(*app_args)
 			except KeyboardInterrupt:
 				self.stdout.write("\nSee ya :)\n")
 			except Exception, e:

@@ -4,10 +4,8 @@
 
 
 import os, re 
-from django.conf import settings 
+import conf
 from django.template import Template, Context
-
-SERVER_DUMP_PATH = getattr(settings, 'ROCKET_DUMP_PATH', '/tmp')
 
 def read_file(path):
 	f = open(path, 'r')
@@ -24,9 +22,9 @@ def ensure_path(path):
 			os.mkdir(p)
 			
 def is_ignore_file(filename):
-	if filename.endswith('~'):
+	if unicode(filename).endswith('~'):
 		return True
-	if filename.endswith('pyc'):
+	if unicode(filename).endswith('pyc'):
 		return True
 	return False
 	
@@ -114,8 +112,9 @@ class Dumper(object):
 	def __init__(self, node, template):
 		self.node = node 
 		self.template = template 
+		self.debug = None
 	
-		self.target_path = os.path.join(SERVER_DUMP_PATH, self.node.name)
+		self.target_path = os.path.join(conf.SERVER_DUMP_PATH, self.node.name)
 		self.template_name = self.template.replace(os.sep, '-')
 		self.template_path = find_template_path(template)
 		self.template_script_dir = os.path.join(self.template_path, 'SCRIPTS')
@@ -128,7 +127,7 @@ class Dumper(object):
 			if matches:
 				number = int(matches.group(1))
 				result = max(number+1, result) 
-		return '%0.4d-%s' % (number, script)
+		return '%0.4d-%s' % (result, script)
 		
 	def script(self, script):
 		base_name = os.path.basename(script)
@@ -144,7 +143,7 @@ class Dumper(object):
 			target = source 
 		template_path = os.path.join(self.template_path, source)
 		target_path = os.path.join(self.target_path, target)
-		dump(template_path, target_path, context=self.context)
+		dump(template_path, target_path, context=self.context, debug=self.debug)
 			
 	def get_files(self, source=None, target=None):
 		if not source:
@@ -163,9 +162,10 @@ def _parent_dir_compare(a, b):
 	else:
 		return cmp(a,b)
 		
-def install_template(node, template, context=None):
+def install_template(node, template, context=None, debug=None):
 	dumper = Dumper(node=node, template=template)
 	dumper.context = context 
+	dumper.debug = debug
 	if not os.path.exists(dumper.template_path):
 		return
 	
@@ -177,7 +177,7 @@ def install_template(node, template, context=None):
 	dirs.sort(cmp=_parent_dir_compare)
 	dumper.context['rocket_files'] = files 
 	dumper.context['rocket_dirs'] = dirs
-	dumper.context['rocket_efiles'] = [ x[:-2] for x in dirs if x.endswith('.e') ]
+	dumper.context['rocket_efiles'] = [ x[:-2] for x in dirs if unicode(x).endswith('.e') ]
 
 	# preinst script 
 	dumper.script('preinst')
@@ -191,9 +191,10 @@ def install_template(node, template, context=None):
 	# post inst script 
 	dumper.script('postinst')
 
-def remove_template(node, template, context={}):	
+def remove_template(node, template, context={}, debug=None):	
 	dumper = Dumper(node=node, template=template)
 	dumper.context = context 
+	dumper.debug = debug
 	if not os.path.exists(dumper.template_path):
 		return
 		
@@ -205,7 +206,7 @@ def remove_template(node, template, context={}):
 	dirs.sort(cmp=_parent_dir_compare)
 	dumper.context['rocket_files'] = files 
 	dumper.context['rocket_dirs'] = dirs 
-	dumper.context['rocket_efiles'] = [ x[:-2] for x in dirs if x.endswith('.e') ]
+	dumper.context['rocket_efiles'] = [ x[:-2] for x in dirs if unicode(x).endswith('.e') ]
 	
 	# prerm script 
 	dumper.script('prerm')

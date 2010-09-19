@@ -77,14 +77,14 @@ class Node (models.Model):
 	def get_storage(self):
 		try:
 			return self._storage 
-		except KeyError:
+		except AttributeError:
 			self._storage = s = json.loads(self.storage or '{}')
 			return s 
 			
 	def get_services(self, service):
 		try:
 			return self._services
-		except KeyError:
+		except AttributeError:
 			self._services = s = json.loads(self.services or '[]')
 			return s 
 			
@@ -123,8 +123,19 @@ class Node (models.Model):
 		if hasattr(self, '_storage'):
 			self.storage = json.dumps(self._storage)
 		if hasattr(self, '_services'):
+			self._fix_services_names()
 			self.services = json.dumps(self._services)
 	
+	def _fix_services_names(self):
+		storage = self.get_storage()
+		new_storage = {}
+		for service, children in storage.items():
+			result = {}
+			for key, data in children.items():
+				result[data.get('name')] = data 
+			new_storage[service] = result 
+		self.storage = new_storage 
+		
 	def _manage_ip_fields(self):
 		if self.public_ip and not self.public_ip.startswith('['):
 			self.public_ip = json.dumps([self.public_ip])

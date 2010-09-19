@@ -6,6 +6,10 @@
 VERSION="r2-1-gaad8d93"
 # END GIT POSTCOMMIT ###################################
 
+from rocket import services as services
+from rocket import models as models
+from rocket import loaders as loaders
+
 def get_path():
 	import os
 	return os.path.abspath(os.path.dirname(__file__))

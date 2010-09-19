@@ -1,15 +1,35 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-from rocket.services import Service 
+from rockets import services 
 from django import forms
 
 
-class Media(Service):
+class MediaService(services.Service):
 	name = forms.CharField()
 	
-class Uwsgi(Service):
-	name = forms.CharField()
+	def template(self):
+		return "media"
 	
-class Php(Service):
+	def preset(self):
+		return self.node.os
+
+class UwsgiService(services.Service):
 	name = forms.CharField()
+		
+	def template(self):
+		return "uwsgi"
+	
+	def preset(self):
+		return self.node.os
+				
+	
+class PhpService(services.Service):
+	name = forms.CharField()
+		
+	def template(self):
+		return "php"
+	
+	def preset(self):
+		return self.node.os
+		

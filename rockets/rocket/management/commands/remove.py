@@ -3,15 +3,15 @@
 
 
 from django.core.management.base import NoArgsCommand, BaseCommand, CommandError
-from rockets.rocket.models import *
-from rockets.rocket.loaders import list_services, get_service
+from rockets import models
+from rockets import loaders
 
 
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
 		if not args:
-			services = list_services()
+			services = loaders.list_services()
 			services.sort()
 			for service in services:
 				self.stdout.write(service)
@@ -20,12 +20,12 @@ class Command(BaseCommand):
 			app_args = args[1:]
 			try:
 				self.stdout.write("Removing %s ...\n" % app_name)
-				n = get_service(app_name)()
+				n = loaders.get_service(app_name)()
 				n.command = self
 				n.console.command = self
-				n.node = Node.current()
-				n.load(*app_args, **kwargs)
-				n.remove(*app_args, **kwargs)
+				n.node = models.Node.current()
+				n.load(*app_args)
+				n.remove(*app_args)
 			except Exception, e:
 				raise CommandError(unicode(e))
 
