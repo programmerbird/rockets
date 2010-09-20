@@ -78,7 +78,7 @@ class BaseService(forms.Form):
 		template_context.update(self.values)
 		template_context.update(context)
 		
-		source_path = os.path.join(preset, template)
+		source_path = os.path.join(template, preset)
 		target_path = ''
 		
 		if script == 'install':

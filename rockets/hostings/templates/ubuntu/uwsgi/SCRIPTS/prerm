@@ -1,6 +1,0 @@
-#!/bin/sh
-
-
-update-rc.d uwsgi-{{name}} remove
-
-
