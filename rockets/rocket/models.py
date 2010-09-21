@@ -93,19 +93,14 @@ class Node (models.Model):
 			self._services = s = json.loads(self.services or '[]')
 			return s 
 			
-	def is_installed(self, service):
-		services = self.get_services()
-		return service in services 
-		
-	def install(self, service):
-		if not self.is_installed(service):
-			# install script here
-			self.get_services().append(service)
-		
-	def remove(self, service):
-		if self.is_installed(service):
-			# remove package here
-			self.get_services().remove(service)		
+	def installed(self, service, name=None):
+		storage = self.get_storage()
+		s = storage.get(service)
+		if not s:
+			return False 
+		if not name:
+			return True 
+		return name in s 			
 		
 	def get_services_storage(self, service):
 		storage = self.get_storage()
@@ -126,9 +121,9 @@ class Node (models.Model):
 
 	def _manage_json_fields(self):
 		if hasattr(self, '_storage'):
+			self._fix_services_names()
 			self.storage = json.dumps(self._storage)
 		if hasattr(self, '_services'):
-			self._fix_services_names()
 			self.services = json.dumps(self._services)
 	
 	def _fix_services_names(self):
@@ -140,6 +135,7 @@ class Node (models.Model):
 				result[data.get('name')] = data 
 			new_storage[service] = result 
 		self.storage = new_storage 
+		self._services = self.storage.keys()
 		
 	def _manage_ip_fields(self):
 		if self.public_ip and not self.public_ip.startswith('['):

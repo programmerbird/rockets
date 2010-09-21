@@ -1,0 +1,26 @@
+
+server { 
+	listen       80;
+	{% if domains %}
+	server_name  {% for domain in domains %} {{domain}}{% endfor %};
+	{% endif %}
+
+	# main access log
+	access_log  /var/log/www/{{name}}/access.log main;
+	error_log  /var/log/www/{{name}}/error.log info;
+	
+	root /home/{{user}}/apps/{{name}};
+    
+	location ~* ^.+\.(mpg|avi|mp3|swf|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|txt|tar|mid|midi|wav|rtf|mpeg)$ {
+		access_log off;
+		break;
+	}
+
+	location ~* ^.+\.(jpg|jpeg|gif|png|ico|css|bmp|js)$ {
+		access_log off;
+		expires 30d;
+		break;
+	}
+	
+}
+

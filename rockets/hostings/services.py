@@ -9,17 +9,22 @@ class MediaService(services.Service):
 	name = forms.CharField()
 	
 	def template(self):
-		return "media"
-	
+		return 'media'
+		
 	def preset(self):
 		return self.node.os
 
 class UwsgiService(services.Service):
 	name = forms.CharField()
-		
-	def template(self):
-		return "uwsgi"
 	
+	def template(self):
+		return 'uwsgi'
+	
+	def plugins(self):
+		return [
+			('gitdeploy', 'uwsgi-gitdeploy'),
+		]
+				
 	def preset(self):
 		return self.node.os
 				
@@ -28,8 +33,8 @@ class PhpService(services.Service):
 	name = forms.CharField()
 		
 	def template(self):
-		return "php"
-	
+		return 'php'
+		
 	def preset(self):
 		return self.node.os
 		

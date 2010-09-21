@@ -26,6 +26,8 @@ def is_ignore_file(filename):
 		return True
 	if unicode(filename).endswith('pyc'):
 		return True
+	if unicode(filename)=='.gitignore':
+		return True
 	return False
 	
 def travel(source, target, context={}, ignore_dirs=[], action=None):

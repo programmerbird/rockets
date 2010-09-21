@@ -18,10 +18,40 @@ class BaseService(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(BaseService, self).__init__(*args, **kwargs)
 		self.console = console.Console()
-		self.service_name = None
+		self.name = None
 		self.values = {}
 		self._listeners = []
+		self._plugins = []
 		self.listeners()
+		
+		
+	def add(self, *args, **kwargs):
+		self.values.update(kwargs)
+		self.console.new_form(self)
+		self.confirm_save(*args, **kwargs)
+		
+	# load values into self.values 
+	# call after __init__, before edit and remove operations
+	def load(self, name, *args, **kwargs):
+		self.name = name
+		self.values = self.node.get_service_storage(self.get_name(), name)
+		self.values['name'] = name
+		
+	# load values into self.values 
+	# call after __init__, before add operations
+	def init(self, name, *args, **kwargs):
+		self.name = name
+		self.values = self.node.get_service_storage(self.get_name(), name)
+		self.values['name'] = name
+		
+	def edit(self, *args, **kwargs):
+		self.values.update(kwargs)
+		
+		self.console.edit_form(self)
+		self.confirm_save(*args, **kwargs)
+		
+	def remove(self, *args, **kwargs):
+		self.confirm_delete(*args, **kwargs)
 		
 		
 	@classmethod
@@ -70,7 +100,7 @@ class BaseService(forms.Form):
 		if not script:
 			script = 'install'
 		if not preset:
-			preset = 'generic'
+			preset = self.preset()
 		if not context:
 			context = {}
 		
@@ -90,7 +120,7 @@ class BaseService(forms.Form):
 	def dispatch(self, action=None):
 		Listener.dispatch(node=self.node.name, 
 			service=self.get_name(), 
-			service_name=self.service_name, 
+			name=self.name, 
 			action=action)
 		
 	def install_listeners(self):
@@ -101,19 +131,52 @@ class BaseService(forms.Form):
 		for x in self._listeners:
 			x.delete()
 			
-	def listen(self, method, node='*', service='*', service_name='*', action='*'):
+	def plugin(self, package, template):
+		self._plugins += (package, template),
+			
+		
+	def install(self):
+		tmp = self.template()
+		if isinstance(tmp, basestring):
+			context = None 
+			template = tmp
+		else:
+			(template, context) = tmp 
+		self.deploy(template, context=context)
+		self._plugins = []
+		self.plugins()
+		for (package, plugin_template) in self._plugins:
+			if self.node.installed(package, self.name):
+				self.deploy(plugin_template, context=context)
+	
+	def uninstall(self):
+		tmp = self.template()
+		if isinstance(tmp, basestring):
+			context = None 
+			template = tmp
+		else:
+			(template, context) = tmp 
+		self.undeploy(template, context=context)
+		self._plugins = []
+		self.plugins()
+		for (package, plugin_template) in self._plugins:
+			if self.node.installed(package, self.name):
+				self.undeploy(plugin_template, context=context)
+	
+
+	def listen(self, method, node='*', service='*', name='*', action='*'):
 		data = {
 			"method": "rocket.services.invoke",
 			"parameters": json.dumps({
 				'class_name': self.__class__.__name__,
 				'node_name': self.node.name,
 				'service': self.get_name(),
-				'service_name': self.service_name,
+				'name': self.name,
 				'method': method,
 			}),
 			"node": node,
 			"service": service, 
-			"service_name": service_name,
+			"name": name,
 			"action": action,
 		}
 		pk = hashdict(data)
@@ -121,50 +184,9 @@ class BaseService(forms.Form):
 		listener = Listener(**data)
 		self.listeners.append(listener)
 		return listener
-			
-	class Meta:
-		abstract = True
 		
-class Service(BaseService):
-	node = None
-	service_name = None 
-	
-	def listeners(self):
-		pass 
-	
-	def requirements(self):
-		pass
 		
-	def add(self, *args, **kwargs):
-		self.values.update(kwargs)
-		self.console.new_form(self)
-		self.confirm_save(*args, **kwargs)
-		
-	# load values into self.values 
-	# call after __init__, before edit and remove operations
-	def load(self, name, *args, **kwargs):
-		self.service_name = name
-		self.values = self.node.get_service_storage(self.get_name(), name)
-		self.values['name'] = name
-		
-	# load values into self.values 
-	# call after __init__, before add operations
-	def init(self, name, *args, **kwargs):
-		self.service_name = name
-		self.values = self.node.get_service_storage(self.get_name(), name)
-		self.values['name'] = name
-		
-	def edit(self, *args, **kwargs):
-		self.values.update(kwargs)
-		self.console.edit_form(self)
-		self.confirm_save(*args, **kwargs)
-		
-	def remove(self, *args, **kwargs):
-		if args:
-			self.service_name = args[0]
-			self.values['name'] = self.service_name
-		self.confirm_delete(*args, **kwargs)
-		
+
 	def delete(self):
 		self.dispatch('pre_remove')
 		self.uninstall_listeners()
@@ -179,6 +201,26 @@ class Service(BaseService):
 		self.listeners()
 		self.install_listeners()
 		self.dispatch('post_save')
+				
+	def deploy(self, template=None, context=None, preset=None):
+		self.dumps(template, script='install', preset=preset, context=context)
+		
+	def undeploy(self, template=None, context=None, preset=None):
+		self.dumps(template, script='uninstall', preset=preset, context=context)
+		
+			
+	class Meta:
+		abstract = True
+		
+class Service(BaseService):
+	node = None
+	name = None 
+	
+	def listeners(self):
+		pass 
+	
+	def requirements(self):
+		pass
 		
 	def template(self):
 		return 
@@ -186,33 +228,21 @@ class Service(BaseService):
 	def preset(self):
 		return "generic"
 		
-	def install(self):
-		t = self.template()
-		if isinstance(t, basestring):
-			template = t 
-			context = None
-		else:
-			(template, context) = t
-		self.dumps(template, script='install', preset=self.preset(), context=context)
+	def plugins(self):
+		pass
 		
-	def uninstall(self):
-		t = self.template()
-		if isinstance(t, basestring):
-			template = t 
-			context = None
-		else:
-			(template, context) = t
-		self.dumps(template, script='uninstall', preset=self.preset(), context=context)
-			
+	def template(self):
+		pass 
+		
 	class Meta:
 		pass
 		
-def invoke(listener, class_name, node_name=None, service=None, service_name=None, method=None):
+def invoke(listener, class_name, node_name=None, service=None, name=None, method=None):
 	pass 
 	
 class NodeService(Service):
 	# node = some models.Node instance 
-	# service_name = None 
+	# name = None 
 	
 	name = forms.CharField()
 	public_ip = forms.CharField(required=False)
@@ -224,7 +254,7 @@ class NodeService(Service):
 	
 	def init(self, name=None):
 		if name:
-			self.service_name = name 
+			self.name = name 
 			self.values['name'] = name
 		self.node = Node()
 	

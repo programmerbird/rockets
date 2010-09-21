@@ -1,0 +1,18 @@
+<VirtualHost *>
+
+    ServerName {{name}}.localhost
+	{% if domains %}
+	ServerAlias  {% for domain in domains %} {{domain}}{% endfor %};
+	{% endif %}
+	DocumentRoot /home/{{user}}/apps/{{name}}/app{{secret}}
+    <Directory /home/{{user}}/apps/{{name}}/app{{secret}}/>
+            Options Indexes FollowSymLinks MultiViews
+            AllowOverride All
+            Order allow,deny
+            allow from all
+    </Directory>
+
+    LogLevel warn
+
+</VirtualHost>
+
