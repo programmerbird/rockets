@@ -55,13 +55,13 @@ VERSION = __import__('rockets').VERSION
 	
 setup(name='Rockets',
 	version=VERSION,
-	description='Cloud management tools',
+	description='Server management tools',
 	author='Sittipon Simasanti',
 	author_email='ssimasanti@gmail.com',
 	url='http://github.com/ssimasanti/rockets/',
-	scripts=['rockets/bin/rocket',],
+	scripts=['rockets/bin/rocket2',],
 	requires=[
-		'Django (>=1.1.1)',
+		'Django (>=1.2.3)',
 	],
 	packages=packages,
 	package_data = package_data,

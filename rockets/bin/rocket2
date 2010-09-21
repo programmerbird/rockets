@@ -1,0 +1,49 @@
+#!/bin/bash
+
+ROCKETDIR=$(pwd)
+REQUIREMENTS="""
+Django==1.2.3
+Fabric==0.9.2
+paramiko==1.7.6
+pycrypto==2.0.1
+wsgiref==0.1.2
+-e git+http://github.com/ssimasanti/rockets.git#egg=Rockets
+"""
+
+while [ ! -d "$ROCKETDIR/.rockets" ] 
+do
+	if [ "$ROCKETDIR" == "/" ]
+	then
+		ROCKETDIR=""
+		break 
+	fi
+	ROCKETDIR=$(dirname "$ROCKETDIR")
+done
+
+
+if [ -z $ROCKETDIR ]
+then
+	if [ "$1" == "init" ]
+	then
+		ROCKETDIR=$(pwd)
+		virtualenv --no-site-packages .rockets
+	else
+		echo "fatal: Not a rocket (or any of the parent directories): .rockets"
+		exit 1
+	fi
+fi
+
+PYTHON=$ROCKETDIR/.rockets/bin/python
+PIP=$ROCKETDIR/.rockets/bin/pip
+if [ "$1" == "init" ]
+then
+	for X in $REQUIREMENTS
+	do
+		$PIP install "$X"
+	done
+	$PYTHON -m rockets.bootstrap "$ROCKETDIR"
+	$PYTHON $ROCKETDIR/manage.py syncdb 
+else
+	$PYTHON $ROCKETDIR/manage.py $*
+fi
+

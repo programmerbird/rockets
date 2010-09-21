@@ -1,6 +1,0 @@
-#!/bin/sh
-
-rm /etc/init.d/boatyard-{{name}}
-update-rc.d boatyard-{{name}} remove
-
-

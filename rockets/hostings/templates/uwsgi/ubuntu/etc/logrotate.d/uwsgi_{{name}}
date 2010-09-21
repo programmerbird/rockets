@@ -1,0 +1,13 @@
+/var/log/www/{{name}}/uwsgi/*.log {
+	daily
+	missingok
+	rotate 52
+	compress
+	delaycompress
+	notifempty
+	create 640 root adm
+	sharedscripts
+	postrotate
+		[ ! -f /var/run/uwsgi-{{name}}.pid ] || /etc/init.d/uwsgi-{{name}} restart
+	endscript
+}
