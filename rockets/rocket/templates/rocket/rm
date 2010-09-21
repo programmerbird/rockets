@@ -21,3 +21,9 @@ PACK_EFILE () {
 {% endfor %}
 {% endif %}
 
+{% if rocket_links %}
+# symbolic links
+{% for source,target in rocket_links %}rm -f "{{target}}"
+{% endfor %}
+{% endif %}
+

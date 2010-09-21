@@ -79,10 +79,13 @@ def dump(source, target, context={}, ignore_dirs=[], debug=None):
 			return 
 		if is_ignore_file(source):
 			return 
+		if source.endswith('->'):
+			return
 		if debug:
 			debug(target)
 		content = read_file(source)
 		rendered_content = Template(unicode(content)).render(template_context)
+			
 		ensure_path(os.path.dirname(target))
 		f = open(target, 'w')
 		try:
@@ -98,10 +101,17 @@ def dump(source, target, context={}, ignore_dirs=[], debug=None):
 def get_files(source, target, context={}, ignore_dirs=[]):
 	files = []
 	dirs = []
-	
+	links = []
+		
+	template_context = Context(context)
 	def add(source, target):
 		if os.path.isfile(source):
-			files.append(target)
+			if source.endswith('->'):
+				content = read_file(source)
+				rendered_content = Template(unicode(content)).render(template_context)
+				links.append((rendered_content.strip(), target[:-2]),)
+			else:
+				files.append(target)
 		elif os.path.exists(source):
 			dirs.append(target)
 			
@@ -109,7 +119,7 @@ def get_files(source, target, context={}, ignore_dirs=[]):
 		context=context, 
 		ignore_dirs=ignore_dirs, 
 		action=add)
-	return dirs, files
+	return dirs, files, links
 
 NUMBER_PATTERN = re.compile(r'^(\d+)\-')
 
@@ -168,16 +178,34 @@ class Dumper(object):
 			source = ''
 		if not target:
 			target = source 
+			
 		template_path = os.path.join(self.template_path, source)
 		target_path = os.path.join(self.target_path, target)
 		return get_files(template_path, target_path, context=self.context, 
 			ignore_dirs=[self.template_plugin_dir, self.template_script_dir])
 			
+	def quickscan(self):
+		dirs, files, links = self.get_files()
+		prefix_length = len(self.target_path)
+		dirs = [ x[prefix_length:] for x in dirs ]
+		files = [ x[prefix_length:] for x in files ]
+		links = [ (source, target[prefix_length:]) for source,target in links ]
+		dirs.sort(cmp=_parent_dir_compare)
+		self.context['rocket_dirs'] = dirs
+		self.context['rocket_files'] = files 
+		self.context['rocket_links'] = links
+		self.context['rocket_efiles'] = [ x[:-2] for x in dirs if unicode(x).endswith('.e') ]
+		
+		self.files = files 
+		self.dirs = dirs
+			
+		
+			
 def _parent_dir_compare(a, b):
 	if a.startswith(b):
-		return -1
-	elif b.startswith(a):
 		return 1
+	elif b.startswith(a):
+		return -1
 	else:
 		return cmp(a,b)
 		
@@ -189,14 +217,7 @@ def install_template(node, template, context=None, debug=None):
 		return
 	
 	# get installed files + folders  
-	dirs, files = dumper.get_files()
-	prefix_length = len(dumper.target_path)
-	dirs = [ x[prefix_length:] for x in dirs ]
-	files = [ x[prefix_length:] for x in files ]
-	dirs.sort(cmp=_parent_dir_compare)
-	dumper.context['rocket_files'] = files 
-	dumper.context['rocket_dirs'] = dirs
-	dumper.context['rocket_efiles'] = [ x[:-2] for x in dirs if unicode(x).endswith('.e') ]
+	dumper.quickscan()
 
 	# preinst script 
 	dumper.script('preinst')
@@ -218,25 +239,26 @@ def remove_template(node, template, context={}, debug=None):
 		return
 		
 	# get installed files + folders  
-	dirs, files = dumper.get_files()
-	prefix_length = len(dumper.target_path)
-	dirs = [ x[prefix_length:] for x in dirs ]
-	files = [ x[prefix_length:] for x in files ]
-	dirs.sort(cmp=_parent_dir_compare)
-	dumper.context['rocket_files'] = files 
-	dumper.context['rocket_dirs'] = dirs 
-	dumper.context['rocket_efiles'] = [ x[:-2] for x in dirs if unicode(x).endswith('.e') ]
+	dumper.quickscan()
 	
 	# prerm script 
 	dumper.script('prerm')
 	
-	# remove dump files
-	for x in files:
+	# remove links
+	for x in dumper.links:
 		try:
 			os.remove(os.path.join(dumper.target_path, x[1:]))
 		except OSError:
 			pass 
-	for x in dirs:
+	
+	# remove dump files
+	for x in dumper.files:
+		try:
+			os.remove(os.path.join(dumper.target_path, x[1:]))
+		except OSError:
+			pass 
+			
+	for x in dumper.dirs:
 		try:
 			os.rmdir(os.path.join(dumper.target_path, x[1:]))
 		except OSError:

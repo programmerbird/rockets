@@ -46,10 +46,10 @@ class Listener(models.Model):
 	parameters = models.TextField(null=True, blank=True)
 	
 	@classmethod 
-	def dispatch(self, node, service, service_name, action):	
+	def dispatch(self, node, service, name, action):	
 		listeners = Listener.objects.filter(Q(node=node)|Q(node='*')) \
 			.filter(Q(service=service)|Q(service='*')) \
-			.filter(Q(service_name=service_name)|Q(service_name='*')) \
+			.filter(Q(service_name=name)|Q(name='*')) \
 			.filter(Q(action=action)|Q(action='*'))
 		for listener in listeners:
 			listener.sender = node 
