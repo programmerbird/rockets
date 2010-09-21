@@ -7,14 +7,13 @@ from rockets import models
 from rockets import loaders
 
 
-
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
 		if not args:
 			services = loaders.list_services()
 			services.sort()
 			for service in services:
-				self.stdout.write(service)
+				self.stdout.write("%s\n" % service)
 		else:
 			app_name = args[0]
 			app_args = args[1:]
@@ -26,6 +25,8 @@ class Command(BaseCommand):
 				n.node = models.Node.current()
 				n.load(*app_args)
 				n.edit(*app_args)
+			except KeyboardInterrupt:
+				self.stdout.write("\nGoodbye :)\n")
 			except Exception, e:
 				raise CommandError(unicode(e))
 

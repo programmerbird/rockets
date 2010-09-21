@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+import os
 from rockets import services 
 from django import forms
 
@@ -16,7 +17,13 @@ class MediaService(services.Service):
 
 class UwsgiService(services.Service):
 	name = forms.CharField()
+	processes = forms.IntegerField(initial=4)
+	django_settings = forms.CharField(initial='settings_production')
 	
+	def init(self, *args, **kwargs):
+		super(UwsgiService, self).init(*args, **kwargs)
+		self.values['secret'] = os.urandom(5).encode('hex')
+		
 	def template(self):
 		return 'uwsgi'
 	

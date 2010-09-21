@@ -12,7 +12,10 @@ import conf
 
 
 SERVER_DUMP_PATH = getattr(settings, 'SERVER_DUMP_PATH', '/tmp')
-
+class DuplicateServiceNameException(Exception):
+	def __unicode__(self):
+		return "Duplicate service name already existed"
+		
 class BaseService(forms.Form):
 		
 	def __init__(self, *args, **kwargs):
@@ -42,6 +45,9 @@ class BaseService(forms.Form):
 	def init(self, name, *args, **kwargs):
 		self.name = name
 		self.values = self.node.get_service_storage(self.get_name(), name)
+		if self.values:
+			raise DuplicateServiceNameException
+			
 		self.values['name'] = name
 		
 	def edit(self, *args, **kwargs):
@@ -81,6 +87,7 @@ class BaseService(forms.Form):
 				if result in 'Yy':
 					break
 				self.console.edit_form(self)
+		self.node.set_service_storage(kind, name, self.values)
 		self.save()
 		self.console.write('%s saved.\n' % kind.title())
 	
@@ -267,6 +274,7 @@ class NodeService(Service):
 	def install(self):					
 		for field in self:
 			setattr(self.node, field.name, self.values[field.name])
+		self.node.save()
 
 	def uninstall(self):
 		self.node.delete()

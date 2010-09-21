@@ -9,6 +9,7 @@ VERSION="r2-1-gaad8d93"
 from rocket import services as services
 from rocket import models as models
 from rocket import loaders as loaders
+from rocket import conf as conf
 
 def get_path():
 	import os

@@ -69,6 +69,8 @@ class Node (models.Model):
 	provider = models.CharField(max_length=200, null=True, blank=True)
 	os = models.CharField(max_length=200, null=True, blank=True, default='ubuntu')
 	username = models.CharField(max_length=200, blank=True, default='root')
+	port = models.IntegerField(default=22)
+	
 	services = models.TextField(blank=True, default='[]')
 	storage = models.TextField(blank=True, default='{}')
 	
@@ -115,8 +117,17 @@ class Node (models.Model):
 		if name not in services_storage:
 			service_storage = services_storage[name] = {}
 		else:
-			service_storage = services_storage[name] = {}
+			service_storage = services_storage[name]
 		return service_storage 
+		
+			
+	def set_service_storage(self, service, name, values):
+		services_storage = self.get_services_storage(service)
+		if name not in services_storage:
+			service_storage = services_storage[name] = {}
+		else:
+			service_storage = services_storage[name]
+		services_storage[name] = values
 		
 
 	def _manage_json_fields(self):
