@@ -50,19 +50,26 @@ for x in package_paths:
 	if not package in package_data:
 		package_data[package] = []
 	package_data[package].append( x[len(package)+1:] + '/*' )
+
+
+print package_data
 	
 VERSION = __import__('rockets').VERSION
-	
-setup(name='Rockets',
-	version=VERSION,
-	description='Server management tools',
-	author='Sittipon Simasanti',
-	author_email='ssimasanti@gmail.com',
-	url='http://github.com/ssimasanti/rockets/',
-	scripts=['rockets/bin/rocket2',],
-	requires=[
-		'Django (>=1.2.3)',
-	],
-	packages=packages,
-	package_data = package_data,
-	)
+try:
+	setup(name='Rockets',
+		version=VERSION,
+		description='Server management tools',
+		author='Sittipon Simasanti',
+		author_email='ssimasanti@gmail.com',
+		url='http://github.com/ssimasanti/rockets/',
+		scripts=['rockets/bin/rocket',],
+		requires=[
+			'Django (>=1.2.3)',
+		],
+		packages=packages,
+		package_data = package_data,
+		)
+except:
+	import traceback
+	traceback.print_exc()
+

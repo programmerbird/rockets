@@ -5,9 +5,9 @@ import json
 
 from fabric.api import put, run, local, cd, settings, env, hide, show
 from django.core.management.base import NoArgsCommand, BaseCommand, CommandError
-from rockets import models
-from rockets import loaders
-from rockets import conf 
+from rockets.core import models
+from rockets.core import loaders
+from rockets.core import conf 
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):

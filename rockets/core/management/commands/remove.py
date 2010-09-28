@@ -3,8 +3,8 @@
 
 
 from django.core.management.base import NoArgsCommand, BaseCommand, CommandError
-from rockets import models
-from rockets import loaders
+from rockets.core import models
+from rockets.core import loaders
 
 
 class Command(BaseCommand):

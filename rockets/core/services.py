@@ -144,11 +144,12 @@ class BaseService(forms.Form):
 		
 	def install(self):
 		tmp = self.template()
-		if isinstance(tmp, basestring):
-			context = None 
-			template = tmp
-		else:
-			(template, context) = tmp 
+		context = None
+		if tmp:
+			if isinstance(tmp, basestring):
+				template = tmp
+			else:
+				(template, context) = tmp 
 		self.deploy(template, context=context)
 		self._plugins = []
 		self.plugins()
@@ -158,12 +159,13 @@ class BaseService(forms.Form):
 	
 	def uninstall(self):
 		tmp = self.template()
-		if isinstance(tmp, basestring):
-			context = None 
-			template = tmp
-		else:
-			(template, context) = tmp 
-		self.undeploy(template, context=context)
+		context = None
+		if tmp:
+			if isinstance(tmp, basestring):
+				template = tmp
+			else:
+				(template, context) = tmp 
+			self.undeploy(template, context=context)
 		self._plugins = []
 		self.plugins()
 		for (package, plugin_template) in self._plugins:

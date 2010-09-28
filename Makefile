@@ -8,19 +8,20 @@ testenv: clean build/rockets.tar.gz
 	env/bin/python setup.py install 
 	readlink -f . > env/lib/python2.6/site-packages/rockets.pth
 
+tt:
 	# make local
-	grep -v "egg=Rocket" rockets/bin/rocket2 > env/bin/rocket2
-	chmod +x env/bin/rocket2
+	grep -v "egg=Rocket" rockets/bin/rocket > env/bin/rocket
+	chmod +x env/bin/rocket
 	
 	# test begin!
 	rm -rf tests
 	mkdir -p tests
-	-cd tests; rocket2 init
+	-cd tests; rocket init
 	mkdir -p tests/.rockets/lib/python2.6/site-packages/
 	readlink -f . > tests/.rockets/lib/python2.6/site-packages/rockets.pth
 	
 test:
-	cd tests; rocket2 init
+	cd tests; rocket init
 	
 fulltest: clean build/rockets.tar.gz
 	rm -rf /tmp/rockets-env 
@@ -46,3 +47,4 @@ setupgit:
 	git remote add dropbox ../../Dropbox/projects/rockets/
 	echo "build/" >> .git/info/exclude 
 	echo "tests/" >> .git/info/exclude
+

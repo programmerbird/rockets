@@ -3,8 +3,8 @@
 
 
 from django.core.management.base import NoArgsCommand, BaseCommand, CommandError
-from rockets import models
-from rockets import loaders
+from rockets.core import models
+from rockets.core import loaders
 
 
 class Command(BaseCommand):
@@ -18,13 +18,13 @@ class Command(BaseCommand):
 			app_name = args[0]
 			app_args = args[1:]
 			try:
-				self.stdout.write("Editing %s ...\n" % app_name)
+				self.stdout.write("Adding %s ...\n" % app_name)
 				n = loaders.get_service(app_name)()
 				n.command = self
 				n.console.command = self
 				n.node = models.Node.current()
-				n.load(*app_args)
-				n.edit(*app_args)
+				n.init(*app_args)
+				n.add(*app_args)
 			except KeyboardInterrupt:
 				self.stdout.write("\nGoodbye :)\n")
 			except Exception, e:
