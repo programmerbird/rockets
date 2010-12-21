@@ -15,16 +15,17 @@ class Command(BaseCommand):
 			for service in services:
 				self.stdout.write("%s\n" % service)
 		else:
-			app_name = args[0]
-			app_args = args[1:]
+			app_kind = args[0]
+			app_name = args[1]
+			app_args = args[2:]
 			try:
 				self.stdout.write("Editing %s ...\n" % app_name)
-				n = loaders.get_service(app_name)()
-				n.command = self
-				n.console.command = self
-				n.node = models.Node.current()
-				n.load(*app_args)
-				n.edit(*app_args)
+				pk = '%s:%s' % (app_kind, app_name) 
+				
+				node = models.Node.current()
+				service = node.service(pk)
+				service.io(self)
+				service.edit(*app_args)
 			except KeyboardInterrupt:
 				self.stdout.write("\nGoodbye :)\n")
 			except Exception, e:

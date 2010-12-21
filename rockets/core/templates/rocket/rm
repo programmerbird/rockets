@@ -5,7 +5,7 @@ RMDIR=rmdir --ignore-fail-on-non-empty
 
 {% if rocket_efiles %}
 PACK_EFILE () {
-	ls "$1.e/*" | sort | sed "s/^\(.*\)$/cat \1/g" | sh > "$1"
+	ls "$1{{extendfile_suffix}}/*" | sort | sed "s/^\(.*\)$/cat \1/g" | sh > "$1"
 }
 {% endif %}
 

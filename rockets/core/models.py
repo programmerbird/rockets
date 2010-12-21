@@ -88,47 +88,48 @@ class Node (models.Model):
 			self._storage = s = json.loads(self.storage or '{}')
 			return s 
 			
-	def get_services(self, service):
+	def get_services(self):
 		try:
 			return self._services
 		except AttributeError:
 			self._services = s = json.loads(self.services or '[]')
 			return s 
 			
-	def installed(self, service, name=None):
+	def installed(self, kind, name=None):
 		storage = self.get_storage()
-		s = storage.get(service)
-		if not s:
-			return False 
-		if not name:
-			return True 
-		return name in s 			
+		for pk, service_storage in storage.items():
+			service_kind = service_storage.get('kind')
+			service_name = service_storage.get('name')
+			if kind != service_kind:
+				continue
+			if not name:
+				return True
+			if name != service_name:
+				continue
+			return True
+		return False
 		
-	def get_services_storage(self, service):
+	def service(self, pk):
+		import loaders
+		(kind, name) = pk.split(':', 1)
+		n = loaders.get_service(kind)()
+		data = self.get_storage().get(pk, {})
+		n.node = self
+		n.kind = kind
+		n.name = name
+		n.deserialize(data.get('storage'), {})
+		return n
+		
+	def save_service(self, service):
 		storage = self.get_storage()
-		if service not in storage:
-			services_storage = storage[service] = {}
-		else:
-			services_storage = storage[service] 
-		return services_storage
-			
-	def get_service_storage(self, service, name):
-		services_storage = self.get_services_storage(service)
-		if name not in services_storage:
-			service_storage = services_storage[name] = {}
-		else:
-			service_storage = services_storage[name]
-		return service_storage 
-		
-			
-	def set_service_storage(self, service, name, values):
-		services_storage = self.get_services_storage(service)
-		if name not in services_storage:
-			service_storage = services_storage[name] = {}
-		else:
-			service_storage = services_storage[name]
-		services_storage[name] = values
-		
+		kind = service.kind 
+		name = service.name
+		pk = '%s:%s' % (kind, name)
+		storage[pk] = {
+			'name': service.name,
+			'kind': service.kind,
+			'storage': service.serialize(),
+		}
 
 	def _manage_json_fields(self):
 		if hasattr(self, '_storage'):
@@ -140,11 +141,12 @@ class Node (models.Model):
 	def _fix_services_names(self):
 		storage = self.get_storage()
 		new_storage = {}
-		for service, children in storage.items():
+		for service, datastore in storage.items():
 			result = {}
-			for key, data in children.items():
-				result[data.get('name')] = data 
-			new_storage[service] = result 
+			name = datastore.get('name')
+			kind = datastore.get('kind')
+			pk = '%s:%s' % (kind, name)
+			new_storage[pk] = datastore			 
 		self.storage = new_storage 
 		self._services = self.storage.keys()
 		
@@ -159,6 +161,15 @@ class Node (models.Model):
 		self._manage_ip_fields()
 		super(Node, self).save(*args, **kwargs)
 		
+	def resolve_plugins(self, name=None):
+		storage = self.get_storage()
+		for pk, service_storage in storage.items():
+			service_name = service_storage.get('name')
+			if name and service_name != name:
+				continue
+			service = self.service(pk) 
+			service.install_plugins(force=False)				
 
 	def __unicode__(self):
-		return self.name			
+		return self.name
+

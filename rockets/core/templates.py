@@ -5,7 +5,11 @@
 
 import os, re 
 import conf
+from django.conf import settings
 from django.template import Template, Context
+
+SYMLINK_SUFFIX = getattr(settings, 'SYMLINK_SUFFIX', '->')
+EXTENDFILE_SUFFIX = getattr(settings, 'EXTENDFILE_SUFFIX', '.e')
 
 def read_file(path):
 	f = open(path, 'r')
@@ -79,7 +83,7 @@ def dump(source, target, context={}, ignore_dirs=[], debug=None):
 			return 
 		if is_ignore_file(source):
 			return 
-		if source.endswith('->'):
+		if source.endswith(SYMLINK_SUFFIX):
 			return
 		if debug:
 			debug(target)
@@ -106,10 +110,10 @@ def get_files(source, target, context={}, ignore_dirs=[]):
 	template_context = Context(context)
 	def add(source, target):
 		if os.path.isfile(source):
-			if source.endswith('->'):
+			if source.endswith(SYMLINK_SUFFIX):
 				content = read_file(source)
 				rendered_content = Template(unicode(content)).render(template_context)
-				links.append((rendered_content.strip(), target[:-2]),)
+				links.append((rendered_content.strip(), target[:-len(SYMLINK_SUFFIX)]),)
 			else:
 				files.append(target)
 		elif os.path.exists(source):
@@ -194,7 +198,8 @@ class Dumper(object):
 		self.context['rocket_dirs'] = dirs
 		self.context['rocket_files'] = files 
 		self.context['rocket_links'] = links
-		self.context['rocket_efiles'] = [ x[:-2] for x in dirs if unicode(x).endswith('.e') ]
+		self.context['rocket_efiles_suffix'] = EXTENDFILE_SUFFIX
+		self.context['rocket_efiles'] = [ x[:-len(EXTENDFILE_SUFFIX)] for x in dirs if unicode(x).endswith(EXTENDFILE_SUFFIX) ]
 		
 		self.files = files 
 		self.dirs = dirs

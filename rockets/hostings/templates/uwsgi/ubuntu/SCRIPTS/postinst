@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-APP_PATH=/home/{{name}}/uwsgi/app{{secret}}
+APP_PATH=/home/{{name}}/app/uwsgi{{secret}}
 
 if [ -z $(grep "^{{name}}:" /etc/passwd) ]
 then

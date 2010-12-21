@@ -20,9 +20,9 @@ class UwsgiService(services.Service):
 	processes = forms.IntegerField(initial=4)
 	django_settings = forms.CharField(initial='settings_production')
 	
-	def init(self, *args, **kwargs):
-		super(UwsgiService, self).init(*args, **kwargs)
+	def add(self, *args, **kwargs):
 		self.values['secret'] = os.urandom(5).encode('hex')
+		super(UwsgiService, self).add(*args, **kwargs)
 		
 	def template(self):
 		return 'uwsgi'
@@ -54,10 +54,10 @@ class DomainService(services.Service):
 		for arg in args:
 			if arg not in domains:
 				domains.append(arg)
-		kind = self.get_name()
-		self.node.set_service_storage(kind, name, self.values)
+		self.values['domains'] = domains
+		self.node.save_service(self)
 		self.save()
-		self.console.write('%s saved.\n' % kind.title())
+		self.console.write('%s saved.\n' % self.get_name())
 	
 	def edit(self, name, *args):
 		return self.add(self, name, *args)
@@ -67,8 +67,8 @@ class DomainService(services.Service):
 		for arg in args:
 			if arg in domains:
 				domains.remove(arg)
-		kind = self.get_name()
-		self.node.set_service_storage(kind, name, self.values)
+		self.values['domains'] = domains
+		self.node.save_service(self)
 		self.save()
-		self.console.write('%s saved.\n' % kind.title())
-		
+		self.console.write('%s saved.\n' % self.get_name())
+

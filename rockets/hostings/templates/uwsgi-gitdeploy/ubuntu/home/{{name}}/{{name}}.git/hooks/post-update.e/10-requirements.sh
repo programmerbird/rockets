@@ -1,5 +1,5 @@
 
-HOME_DIR="/home/{{name}}/uwsgi/app{{secret}}"
+HOME_DIR="/home/{{name}}/app/uwsgi{{secret}}"
 ENV_DIR="/home/{{name}}/env"
 REQUIREMENT_FILE="$HOME_DIR/requirements.ini"
 

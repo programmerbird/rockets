@@ -2,15 +2,15 @@
 
 {% if rocket_efiles %}
 PRESERVE_EFILE () {
-	if [ ! -d "$1.e" ] 
+	if [ ! -d "$1{{rocket_efiles_suffix}}" ] 
 	then
-		mkdir -p "$1.e" 
-		test -f "$1" && mv "$1" "$1.e/00-original"
+		mkdir -p "$1{{rocket_efiles_suffix}}" 
+		test -f "$1" && mv "$1" "$1{{rocket_efiles_suffix}}/00-original"
 	fi
 }
 
 PACK_EFILE () {
-	ls "$1.e/*" | sort | sed "s/^\(.*\)$/cat \1/g" | sh > "$1"
+	ls "$1{{rocket_efiles_suffix}}/*" | sort | sed "s/^\(.*\)$/cat \1/g" | sh > "$1"
 }
 {% endif %}
 

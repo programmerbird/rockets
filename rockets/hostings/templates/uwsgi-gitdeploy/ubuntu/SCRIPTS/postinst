@@ -1,5 +1,5 @@
 cd /home/{{name}}/{{name}}.git 
-git config core.worktree /home/{{name}}/uwsgi/app{{secret}}
+git config core.worktree /home/{{name}}/app/uwsgi{{secret}}
 
 chmod +x /home/{{name}}/{{name}}.git/hooks/post-update
 

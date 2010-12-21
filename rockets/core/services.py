@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-import os 
-import json
+import os, json
 from django import forms
 from utils import hashdict
 from models import * 
-import console
-import templates
-import conf
+import console, templates, conf
 
 
 SERVER_DUMP_PATH = getattr(settings, 'SERVER_DUMP_PATH', '/tmp')
@@ -25,30 +22,17 @@ class BaseService(forms.Form):
 		self.values = {}
 		self._listeners = []
 		self._plugins = []
+		self.addons = []
 		self.listeners()
 		
+	def io(self, cmd):
+		self.command = cmd
+		self.console.command = cmd	
 		
 	def add(self, *args, **kwargs):
 		self.values.update(kwargs)
 		self.console.new_form(self)
 		self.confirm_save(*args, **kwargs)
-		
-	# load values into self.values 
-	# call after __init__, before edit and remove operations
-	def load(self, name, *args, **kwargs):
-		self.name = name
-		self.values = self.node.get_service_storage(self.get_name(), name)
-		self.values['name'] = name
-		
-	# load values into self.values 
-	# call after __init__, before add operations
-	def init(self, name, *args, **kwargs):
-		self.name = name
-		self.values = self.node.get_service_storage(self.get_name(), name)
-		if self.values:
-			raise DuplicateServiceNameException
-			
-		self.values['name'] = name
 		
 	def edit(self, *args, **kwargs):
 		self.values.update(kwargs)
@@ -87,7 +71,7 @@ class BaseService(forms.Form):
 				if result in 'Yy':
 					break
 				self.console.edit_form(self)
-		self.node.set_service_storage(kind, name, self.values)
+		self.node.save_service(self.values)
 		self.save()
 		self.console.write('%s saved.\n' % kind.title())
 	
@@ -111,7 +95,11 @@ class BaseService(forms.Form):
 		if not context:
 			context = {}
 		
-		template_context = {"node": self.node, "rocket_bundle": Session.bundle()}
+		template_context = {
+			"node": self.node, 
+			"rocket_bundle": Session.bundle(), 
+			"service": self,
+		}
 		template_context.update(self.values)
 		template_context.update(context)
 		
@@ -142,7 +130,7 @@ class BaseService(forms.Form):
 		self._plugins += (package, template),
 			
 		
-	def install(self):
+	def install(self, force=True):
 		tmp = self.template()
 		context = None
 		if tmp:
@@ -151,13 +139,9 @@ class BaseService(forms.Form):
 			else:
 				(template, context) = tmp 
 		self.deploy(template, context=context)
-		self._plugins = []
-		self.plugins()
-		for (package, plugin_template) in self._plugins:
-			if self.node.installed(package, self.name):
-				self.deploy(plugin_template, context=context)
+		self.install_plugins(force=force)
 	
-	def uninstall(self):
+	def uninstall(self, force=True):
 		tmp = self.template()
 		context = None
 		if tmp:
@@ -166,11 +150,34 @@ class BaseService(forms.Form):
 			else:
 				(template, context) = tmp 
 			self.undeploy(template, context=context)
+		self.uninstall_plugins(force=force)
+	
+	def uninstall_plugins(self, force=True):
+		context = None
+		if tmp:
+			if isinstance(tmp, basestring):
+				template = tmp
+			else:
+				(template, context) = tmp 
 		self._plugins = []
 		self.plugins()
 		for (package, plugin_template) in self._plugins:
 			if self.node.installed(package, self.name):
 				self.undeploy(plugin_template, context=context)
+	
+	def install_plugins(self, force=True):
+		context = None
+		if tmp:
+			if isinstance(tmp, basestring):
+				template = tmp
+			else:
+				(template, context) = tmp 
+		self._plugins = []
+		self.plugins()
+		for (package, plugin_template) in self._plugins:
+			if self.node.installed(package, self.name):
+				self.deploy(plugin_template, context=context)
+		self.node.resolve_plugins()
 	
 
 	def listen(self, method, node='*', service='*', name='*', action='*'):
@@ -191,7 +198,7 @@ class BaseService(forms.Form):
 		pk = hashdict(data)
 		data['name'] = pk
 		listener = Listener(**data)
-		self.listeners.append(listener)
+		self._listeners.append(listener)
 		return listener
 		
 		
@@ -216,8 +223,17 @@ class BaseService(forms.Form):
 		
 	def undeploy(self, template=None, context=None, preset=None):
 		self.dumps(template, script='uninstall', preset=preset, context=context)
-		
 			
+	def serialize(self):
+		return {
+			'values': self.values, 
+			'addons': self.addons,
+		}
+		
+	def deserialize(self, data):
+		self.values = data.get('values')
+		self.addons = data.get('addons')
+		
 	class Meta:
 		abstract = True
 		
@@ -261,18 +277,21 @@ class NodeService(Service):
 	os = forms.CharField(required=False, initial='ubuntu')
 	username = forms.CharField(required=False, initial='root')
 	
-	def init(self, name=None):
+	def add(self, name=None, *args, **kwargs):
 		if name:
 			self.name = name 
 			self.values['name'] = name
 		self.node = Node()
-	
-	def load(self, name, *args, **kwargs):
-		self.node = node = Node.objects.get(name=name)
+		self.values.update(kwargs)
+		self.console.new_form(self)
+		self.confirm_save(*args, **kwargs)
+			
+	def edit(self, name, *args, **kwargs):
+		self.node = Node.objects.get(name=name)
 		self.values = {}
 		for field in self:
-			self.values[field.name] = getattr(node, field.name)
-			
+			self.values[field.name] = getattr(self.node, field.name)			
+	
 	def install(self):					
 		for field in self:
 			setattr(self.node, field.name, self.values[field.name])

@@ -9,12 +9,12 @@ server {
 	access_log  /var/log/www/{{name}}/uwsgi/access.log main;
 	error_log  /var/log/www/{{name}}/uwsgi/error.log info;
 	
-	root /home/{{name}}/uwsgi/app{{secret}};
+	root /home/{{name}}/app/uwsgi{{secret}};
 	
 	client_max_body_size 50m;
     
 	location /media {
-		root /home/{{name}}/uwsgi/app{{secret}}/media;
+		root /home/{{name}}/app/uwsgi{{secret}}/media;
 	}
 	
 	location ~* ^/media/.+\.(mpg|avi|mp3|swf|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|txt|tar|mid|midi|wav|rtf|mpeg)$ {
@@ -36,7 +36,7 @@ server {
 
 	location  / {
 		uwsgi_pass unix:///tmp/uwsgi-{{name}}.sock;
-		include /etc/uwsgi/nginx/uwsgi_params;
+		include /home/{{name}}/conf/uwsgi_params;
 	}
 	
 	
