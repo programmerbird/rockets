@@ -8,7 +8,7 @@ testenv: clean build/rockets.tar.gz
 	env/bin/python setup.py install 
 	readlink -f . > env/lib/python2.6/site-packages/rockets.pth
 
-tt:
+test:
 	# make local
 	grep -v "egg=Rocket" rockets/bin/rocket > env/bin/rocket
 	chmod +x env/bin/rocket
@@ -19,9 +19,6 @@ tt:
 	cd tests; rocket init
 	mkdir -p tests/.rockets/lib/python2.6/site-packages/
 	readlink -f . > tests/.rockets/lib/python2.6/site-packages/rockets.pth
-	
-test:
-	cd tests; rocket init
 	
 fulltest: clean build/rockets.tar.gz
 	rm -rf /tmp/rockets-env 

@@ -71,7 +71,7 @@ class BaseService(forms.Form):
 				if result in 'Yy':
 					break
 				self.console.edit_form(self)
-		self.node.save_service(self.values)
+		self.node.save_service(self)
 		self.save()
 		self.console.write('%s saved.\n' % kind.title())
 	
@@ -166,6 +166,7 @@ class BaseService(forms.Form):
 				self.undeploy(plugin_template, context=context)
 	
 	def install_plugins(self, force=True):
+		tmp = self.template()
 		context = None
 		if tmp:
 			if isinstance(tmp, basestring):
@@ -177,7 +178,7 @@ class BaseService(forms.Form):
 		for (package, plugin_template) in self._plugins:
 			if self.node.installed(package, self.name):
 				self.deploy(plugin_template, context=context)
-		self.node.resolve_plugins()
+		self.node.resolve_plugins(excludes=[self.pk, ])
 	
 
 	def listen(self, method, node='*', service='*', name='*', action='*'):
@@ -231,8 +232,8 @@ class BaseService(forms.Form):
 		}
 		
 	def deserialize(self, data):
-		self.values = data.get('values')
-		self.addons = data.get('addons')
+		self.values = data.get('values') or {}
+		self.addons = data.get('addons') or {}
 		
 	class Meta:
 		abstract = True
@@ -286,11 +287,13 @@ class NodeService(Service):
 		self.console.new_form(self)
 		self.confirm_save(*args, **kwargs)
 			
-	def edit(self, name, *args, **kwargs):
-		self.node = Node.objects.get(name=name)
+	def edit(self, *args, **kwargs):
+		self.node = Node.objects.get(name=self.name)
 		self.values = {}
 		for field in self:
 			self.values[field.name] = getattr(self.node, field.name)			
+		self.console.edit_form(self)
+		self.confirm_save(*args, **kwargs)
 	
 	def install(self):					
 		for field in self:

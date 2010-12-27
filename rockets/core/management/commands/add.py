@@ -22,11 +22,13 @@ class Command(BaseCommand):
 				self.stdout.write("Adding %s ...\n" % app_kind)
 				pk = '%s:%s' % (app_kind, app_name) 
 				node = models.Node.current()
-				service = node.service(pk)
+				service, is_created = node.get_or_create_service(pk)
 				service.io(self)
 				service.add(*app_args)
 			except KeyboardInterrupt:
 				self.stdout.write("\nGoodbye :)\n")
 			except Exception, e:
+				import traceback
+				traceback.print_exc()
 				raise CommandError(unicode(e))
 

@@ -26,4 +26,5 @@ class Command(BaseCommand):
 			except models.Node.DoesNotExist:
 				raise CommandError('Node "%s" does not exist' % node_name)
 			models.Session.store('node', node.name)
+			self.stdout.write("%s selected\n" % node.name)
 			

@@ -13,7 +13,7 @@ ADMIN_USER = '{{user}}'
 
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
-    'rockets.rocket',
+    'rockets.core',
     'rockets.boatyard',
     'rockets.git',
     'rockets.hostings',

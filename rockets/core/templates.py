@@ -247,7 +247,7 @@ def remove_template(node, template, context={}, debug=None):
 	dumper.quickscan()
 	
 	# prerm script 
-	dumper.script('prerm.sh')
+	dumper.script('prerm')
 	
 	# remove links
 	for x in dumper.links:

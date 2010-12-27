@@ -61,6 +61,9 @@ class Listener(models.Model):
 	def invoke(self):
 		pass 
 		
+class ServiceDoesNotExist(Exception):
+	pass
+		
 class Node (models.Model):
 	name = models.CharField(max_length=200, unique=True)
 	public_ip = models.TextField(null=True, blank=True)
@@ -112,13 +115,32 @@ class Node (models.Model):
 	def service(self, pk):
 		import loaders
 		(kind, name) = pk.split(':', 1)
+		data = self.get_storage().get(pk, {})
+		if data is None:
+			raise ServiceDoesNotExist
+		else:
+			n = loaders.get_service(kind)()
+			n.pk = pk
+			n.node = self
+			n.kind = kind
+			n.name = name
+			n.deserialize(data.get('storage') or {})
+			n.values['name'] = name
+			return n
+		
+	def get_or_create_service(self, pk):
+		import loaders
+		(kind, name) = pk.split(':', 1)
 		n = loaders.get_service(kind)()
 		data = self.get_storage().get(pk, {})
+		is_created = data is None
+		n.pk = pk
 		n.node = self
 		n.kind = kind
 		n.name = name
-		n.deserialize(data.get('storage'), {})
-		return n
+		n.deserialize(data.get('storage') or {})
+		n.values['name'] = name
+		return n, is_created
 		
 	def save_service(self, service):
 		storage = self.get_storage()
@@ -161,10 +183,12 @@ class Node (models.Model):
 		self._manage_ip_fields()
 		super(Node, self).save(*args, **kwargs)
 		
-	def resolve_plugins(self, name=None):
+	def resolve_plugins(self, name=None, excludes=[]):
 		storage = self.get_storage()
 		for pk, service_storage in storage.items():
 			service_name = service_storage.get('name')
+			if pk in excludes:
+				continue
 			if name and service_name != name:
 				continue
 			service = self.service(pk) 

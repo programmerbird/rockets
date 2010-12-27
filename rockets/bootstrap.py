@@ -13,7 +13,7 @@ except ImportError:
 if __name__ == "__main__":
 	setup_environ(settings)
 	import os, sys, getpass
-	from rocket.templates import dump
+	from core.templates import dump
 	
 	project_path = sys.argv[1]
 	user = getpass.getuser()
