@@ -126,8 +126,8 @@ class BaseService(forms.Form):
 		for x in self._listeners:
 			x.delete()
 			
-	def plugin(self, package, template):
-		self._plugins += (package, template),
+	def plugin(self, template, dependencies=[]):
+		self._plugins += (template, dependencies),
 			
 		
 	def install(self, force=True):
@@ -139,7 +139,7 @@ class BaseService(forms.Form):
 			else:
 				(template, context) = tmp 
 		self.deploy(template, context=context)
-		self.install_plugins(force=force)
+		self.node.resolve_plugins(name=self.name)
 	
 	def uninstall(self, force=True):
 		tmp = self.template()
@@ -150,7 +150,7 @@ class BaseService(forms.Form):
 			else:
 				(template, context) = tmp 
 			self.undeploy(template, context=context)
-		self.uninstall_plugins(force=force)
+		self.node.resolve_plugins(name=self.name)
 	
 	def uninstall_plugins(self, force=True):
 		context = None
@@ -161,8 +161,15 @@ class BaseService(forms.Form):
 				(template, context) = tmp 
 		self._plugins = []
 		self.plugins()
-		for (package, plugin_template) in self._plugins:
-			if self.node.installed(package, self.name):
+		for (plugin_template, dependencies) in self._plugins:
+			if not self.addons.get(plugin_template):
+				continue
+			ok = True
+			for package in dependencies:
+				if not self.node.installed(package, self.name):
+					ok = False
+					break
+			if not ok:
 				self.undeploy(plugin_template, context=context)
 	
 	def install_plugins(self, force=True):
@@ -175,10 +182,17 @@ class BaseService(forms.Form):
 				(template, context) = tmp 
 		self._plugins = []
 		self.plugins()
-		for (package, plugin_template) in self._plugins:
-			if self.node.installed(package, self.name):
-				self.deploy(plugin_template, context=context)
-		self.node.resolve_plugins(excludes=[self.pk, ])
+		for (plugin_template, dependencies) in self._plugins:
+			ok = True
+			for package in dependencies:
+				if not self.node.installed(package, self.name):
+					ok = False
+					break
+			if ok:
+				if force or not self.addons.get(plugin_template):
+					print self.pk, "install plugin", plugin_template
+					self.deploy(plugin_template, context=context)
+				self.addons[plugin_template] = True
 	
 
 	def listen(self, method, node='*', service='*', name='*', action='*'):

@@ -29,9 +29,7 @@ class UwsgiService(services.Service):
 		return 'uwsgi'
 	
 	def plugins(self):
-		return [
-			('gitdeploy', 'uwsgi-gitdeploy'),
-		]
+		self.plugin('uwsgi-gitdeploy', dependencies=['gitdeploy',])
 				
 	def preset(self):
 		return self.node.os

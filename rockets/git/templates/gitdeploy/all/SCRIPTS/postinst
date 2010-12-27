@@ -1,0 +1,17 @@
+#!/bin/sh
+
+GIT_PATH=/home/{{name}}/{{name}}.git
+APP_PATH=/home/{{name}}/app
+
+if [ ! -f "$GIT_PATH/HEAD" ]
+then
+	mkdir -p $GIT_PATH
+	cd $GIT_PATH
+	git init --bare
+	git config core.worktree $APP_PATH
+	git config core.bare false 
+	git config receive.denycurrentbranch ignore
+fi
+
+chown -R {{name}}:{{name}} $GIT_PATH
+chmod $GIT_PATH/hooks/post-update

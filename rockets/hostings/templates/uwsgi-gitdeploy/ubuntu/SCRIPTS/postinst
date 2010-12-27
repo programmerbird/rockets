@@ -1,5 +1,11 @@
-cd /home/{{name}}/{{name}}.git 
-git config core.worktree /home/{{name}}/app/uwsgi{{secret}}
+#!/bin/sh
 
-chmod +x /home/{{name}}/{{name}}.git/hooks/post-update
+APP_PATH=/home/{{name}}/app/uwsgi{{secret}}
+GIT_PATH=/home/{{name}}/{{name}}.git
+
+
+cd $GIT_PATH
+git config core.worktree $APP_PATH
+
+chmod +x $GIT_PATH/hooks/post-update
 

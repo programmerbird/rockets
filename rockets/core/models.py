@@ -184,16 +184,23 @@ class Node (models.Model):
 		super(Node, self).save(*args, **kwargs)
 		
 	def resolve_plugins(self, name=None, excludes=[]):
-		storage = self.get_storage()
-		for pk, service_storage in storage.items():
-			service_name = service_storage.get('name')
-			if pk in excludes:
-				continue
-			if name and service_name != name:
-				continue
-			service = self.service(pk) 
-			service.install_plugins(force=False)				
-
+		if not hasattr(self, '_resolving_plugins'):
+			self._resolving_plugins = 0
+		self._resolving_plugins += 1
+		try:
+			if self._resolving_plugins == 1:
+				storage = self.get_storage()
+				for pk, service_storage in storage.items():
+					service_name = service_storage.get('name')
+					if pk in excludes:
+						continue
+					if name and service_name != name:
+						continue
+					service = self.service(pk) 
+					service.install_plugins(force=False)				
+		finally:
+			self._resolving_plugins -= 1
+			
 	def __unicode__(self):
 		return self.name
 
