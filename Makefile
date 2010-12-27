@@ -16,7 +16,7 @@ tt:
 	# test begin!
 	rm -rf tests
 	mkdir -p tests
-	-cd tests; rocket init
+	cd tests; rocket init
 	mkdir -p tests/.rockets/lib/python2.6/site-packages/
 	readlink -f . > tests/.rockets/lib/python2.6/site-packages/rockets.pth
 	

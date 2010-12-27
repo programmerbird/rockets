@@ -36,7 +36,7 @@ server {
 
 	location  / {
 		uwsgi_pass unix:///tmp/uwsgi-{{name}}.sock;
-		include /home/{{name}}/conf/uwsgi_params;
+		include /home/{{name}}/conf/uwsgi_params.conf;
 	}
 	
 	

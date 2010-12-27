@@ -20,9 +20,10 @@ class UwsgiService(services.Service):
 	processes = forms.IntegerField(initial=4)
 	django_settings = forms.CharField(initial='settings_production')
 	
-	def add(self, *args, **kwargs):
-		self.values['secret'] = os.urandom(5).encode('hex')
-		super(UwsgiService, self).add(*args, **kwargs)
+	def save(self, *args, **kwargs):
+		if not self.values.get('secret'):
+			self.values['secret'] = os.urandom(5).encode('hex')
+		super(UwsgiService, self).save(*args, **kwargs)
 		
 	def template(self):
 		return 'uwsgi'

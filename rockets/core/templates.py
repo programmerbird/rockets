@@ -231,7 +231,7 @@ def install_template(node, template, context=None, debug=None):
 	dumper.dump()
 	
 	# inst script 
-	dumper.script(find_template_path('rocket/inst'))
+	dumper.script(find_template_path('rocket/inst.sh'))
 	
 	# post inst script 
 	dumper.script('postinst')
@@ -247,7 +247,7 @@ def remove_template(node, template, context={}, debug=None):
 	dumper.quickscan()
 	
 	# prerm script 
-	dumper.script('prerm')
+	dumper.script('prerm.sh')
 	
 	# remove links
 	for x in dumper.links:
@@ -270,7 +270,7 @@ def remove_template(node, template, context={}, debug=None):
 			pass 
 	
 	# rm script 
-	dumper.script(find_template_path('rocket/rm'))
+	dumper.script(find_template_path('rocket/rm.sh'))
 	
 	# postrm script
 	dumper.script('postrm')
