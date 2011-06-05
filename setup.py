@@ -61,7 +61,7 @@ setup(name='Rockets',
 	url='http://github.com/ssimasanti/rockets/',
 	scripts=['rockets/bin/rocket2',],
 	requires=[
-		'Django (>=1.2.3)',
+		'Django (>=1.3)',
 	],
 	packages=packages,
 	package_data = package_data,

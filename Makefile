@@ -41,8 +41,4 @@ build/rockets.tar.gz: version
 clean:
 	rm -rf build/
 	
-setupgit:
-	git remote add github "git@github.com:ssimasanti/rockets.git"
-	git remote add dropbox ../../Dropbox/projects/rockets/
-	echo "build/" >> .git/info/exclude 
-	echo "tests/" >> .git/info/exclude
+

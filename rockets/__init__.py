@@ -3,7 +3,7 @@
 
 
 # BEGIN GIT POSTCOMMIT #################################
-VERSION="r2-1-gaad8d93"
+VERSION=""
 # END GIT POSTCOMMIT ###################################
 
 from rocket import services as services
