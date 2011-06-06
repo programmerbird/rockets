@@ -1,1 +1,0 @@
-[{"pk": "node", "model": "core.session", "fields": {"value": "localhost"}}, {"pk": 1, "model": "core.node", "fields": {"username": "root", "name": "localhost", "storage": "{}", "port": 22, "public_ip": "[\"127.0.0.1\"]", "private_ip": "[\"127.0.0.1\"]", "provider": null, "services": "[]", "os": "ubuntu"}}]

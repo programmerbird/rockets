@@ -14,10 +14,10 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DESC={{name}}
 
 DAEMON=/etc/uwsgi/uwsgi26
-PIDFILE=/var/run/uwsgi-{{name}}.pid
+PIDFILE=/tmp/uwsgi-{{name}}.pid
 SOCKFILE=/tmp/uwsgi-{{name}}.sock
 DAEMON_OPTS="--processes {{processes}} --harakiri 30 --disable-logging --master \
-			--pidfile /var/run/uwsgi-{{name}}.pid \
+			--pidfile /tmp/uwsgi-{{name}}.pid \
 			--daemonize /dev/null \
 			--socket /tmp/uwsgi-{{name}}.sock \
 			--home /home/{{name}}/env \
@@ -36,7 +36,7 @@ else
 fi
 
 touch $PIDFILE
-chown -R {{user}}:{{user}} $PIDFILE
+chown -R {{name}}:{{name}} $PIDFILE
 
 case "$1" in
   start)

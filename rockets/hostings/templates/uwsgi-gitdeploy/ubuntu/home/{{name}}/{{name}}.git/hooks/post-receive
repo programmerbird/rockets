@@ -1,0 +1,5 @@
+#!/bin/sh
+{% load rockettags %}
+{% servicedata uwsgi name as uwsgi %}
+
+GIT_WORK_TREE=/home/{{name}}/uwsgi/app{{uwsgi.secret}} git checkout -f

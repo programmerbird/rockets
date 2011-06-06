@@ -4,19 +4,24 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-DATABASE_ENGINE = 'sqlite3'
 SECRET_KEY = '{{secret}}'
-
-SERVER_DUMP_PATH = os.path.abspath(os.path.dirname(__file__))
-DATABASE_NAME = os.path.abspath(os.path.join(os.path.dirname(__file__), '.datastore'))
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+SERVER_DUMP_PATH = PROJECT_ROOT
 ADMIN_USER = '{{user}}'
 
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
-    'rockets.core',
+    'rockets.rocket',
     'rockets.boatyard',
     'rockets.git',
     'rockets.hostings',
     'rockets.ssh',
 )
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3', 
+        'NAME': os.path.join(PROJECT_ROOT, '.datastore'),                      
+    }
+}
 

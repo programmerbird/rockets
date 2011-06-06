@@ -1,28 +1,41 @@
-
+{% load rockettags %}
+{% servicedata domain name as domains %}
 server { 
 	listen       80;
 	{% if domains %}
-	server_name  {% for domain in domains %} {{domain}}{% endfor %};
+	server_name  {% for domain in domains.names %} {{domain}}{% endfor %};
 	{% endif %}
 
 	# main access log
 	access_log  /var/log/www/{{name}}/uwsgi/access.log main;
 	error_log  /var/log/www/{{name}}/uwsgi/error.log info;
 	
-	root /home/{{name}}/app/uwsgi{{secret}};
+	root /home/{{name}}/uwsgi/app{{secret}};
 	
 	client_max_body_size 50m;
     
 	location /media {
-		root /home/{{name}}/app/uwsgi{{secret}}/media;
+		root /home/{{name}}/uwsgi/app{{secret}}/media;
+	}
+	location /static {
+		root /home/{{name}}/uwsgi/app{{secret}}/static;
 	}
 	
+    # Set expires max on static file types
 	location ~* ^/media/.+\.(mpg|avi|mp3|swf|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|txt|tar|mid|midi|wav|rtf|mpeg)$ {
 		access_log off;
 		break;
 	}
-
 	location ~* ^/media/.+\.(jpg|jpeg|gif|png|ico|css|bmp|js)$ {
+		access_log off;
+		expires 30d;
+		break;
+	}
+	location ~* ^/static/.+\.(mpg|avi|mp3|swf|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|txt|tar|mid|midi|wav|rtf|mpeg)$ {
+		access_log off;
+		break;
+	}
+	location ~* ^/static/.+\.(jpg|jpeg|gif|png|ico|css|bmp|js)$ {
 		access_log off;
 		expires 30d;
 		break;
@@ -36,8 +49,19 @@ server {
 
 	location  / {
 		uwsgi_pass unix:///tmp/uwsgi-{{name}}.sock;
-		include /home/{{name}}/conf/uwsgi_params.conf;
+		include /etc/uwsgi/nginx/uwsgi_params;
 	}
+	error_page  404  /404.html;
+
+	# redirect server error pages to the static page /50x.html
+	#
+	error_page   500 502 503 504  /50x.html;
+	location = /50x.html {
+		root   /var/www/nginx-default;
+	}
+    location = /404.html {  
+        root  /var/www/nginx-default;  
+    }  
 	
 	
 }
