@@ -1,0 +1,8 @@
+#!/bin/bash
+
+
+cd /home/{{name}}/{{name}}.git
+git init --bare 
+
+chown -R {{name}}:{{name}} /home/{{name}}/{{name}}.git
+

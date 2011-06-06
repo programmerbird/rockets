@@ -4,6 +4,7 @@ import os
 import sys
 
 
+
 def fullsplit(path, result=None):
 	"""
 	Split a pathname into components (the opposite of os.path.join) in a
@@ -50,8 +51,8 @@ for x in package_paths:
 	if not package in package_data:
 		package_data[package] = []
 	package_data[package].append( x[len(package)+1:] + '/*' )
-	
-VERSION = __import__('rockets').VERSION
+
+VERSION='2.0'
 	
 setup(name='Rockets',
 	version=VERSION,
@@ -63,6 +64,6 @@ setup(name='Rockets',
 	requires=[
 		'Django (>=1.3)',
 	],
-	packages=packages,
+	packages = packages,
 	package_data = package_data,
 	)

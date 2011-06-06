@@ -1,5 +1,4 @@
-cd /home/{{name}}/{{name}}.git 
-git config core.worktree /home/{{name}}/uwsgi/app{{secret}}
 
-chmod +x /home/{{name}}/{{name}}.git/hooks/post-update
+chmod +x /home/{{name}}/{{name}}.git/hooks/*
+chown -R {{name}}:{{name}} /home/{{name}}/{{name}}.git/hooks
 

@@ -2,24 +2,14 @@ all: fulltest
 
 version:
 	echo 'VERSION=`git describe --tags`; sed -i "s/^VERSION\=.*$$/VERSION=\"$${VERSION}\"/g" rockets/__init__.py' | sh
-
-testenv: clean build/rockets.tar.gz
-	virtualenv --no-site-packages env 
-	env/bin/python setup.py install 
-	readlink -f . > env/lib/python2.6/site-packages/rockets.pth
-
+	
+test:
 	# make local
 	grep -v "egg=Rocket" rockets/bin/rocket2 > env/bin/rocket2
 	chmod +x env/bin/rocket2
-	
-	# test begin!
-	rm -rf tests
-	mkdir -p tests
-	-cd tests; rocket2 init
-	mkdir -p tests/.rockets/lib/python2.6/site-packages/
-	readlink -f . > tests/.rockets/lib/python2.6/site-packages/rockets.pth
-	
-test:
+
+	readlink -f . > env/lib/python2.7/site-packages/rockets.pth
+	readlink -f . > tests/.rockets/lib/python2.7/site-packages/rockets.pth
 	cd tests; rocket2 init
 	
 fulltest: clean build/rockets.tar.gz

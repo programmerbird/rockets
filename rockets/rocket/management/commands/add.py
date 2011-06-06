@@ -28,5 +28,7 @@ class Command(BaseCommand):
 			except KeyboardInterrupt:
 				self.stdout.write("\nGoodbye :)\n")
 			except Exception, e:
+				import traceback
+				traceback.print_exc()
 				raise CommandError(unicode(e))
 

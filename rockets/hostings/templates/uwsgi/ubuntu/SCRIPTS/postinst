@@ -5,7 +5,7 @@ APP_PATH=/home/{{name}}/uwsgi/app{{secret}}
 
 if [ -z $(grep "^{{name}}:" /etc/passwd) ]
 then
-	adduser --system --disabled-password {{name}}	
+	yes '' | adduser --quiet --disabled-password {{name}}
 	chown -R {{name}}:{{name}} /home/{{name}}
 	usermod -a -G {{name}} www-data
 fi

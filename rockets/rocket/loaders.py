@@ -40,7 +40,6 @@ class PathAppLoader:
 			return self._cache_dict[app_name]
 		except KeyError:
 			raise ServiceNotFoundException 
-			
 		except AttributeError:
 			self.list()
 			return self.get(app_name)

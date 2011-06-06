@@ -32,15 +32,15 @@ class Command(BaseCommand):
 		try:
 			with cd(dump_path):
 				local('tar czf /tmp/rocket-%(secret)s.tar.gz *' % locals(), capture=False)
-				put('/tmp/rocket-%(secret)s.tar.gz' % env, '/tmp/rocket-%(secret2)s.tar.gz' % env)
-				run('mkdir -p /tmp/rocket-%(bundle)s' % env, pty=True)
-				run('tar xzf /tmp/rocket-%(secret2)s.tar.gz --no-overwrite-dir --directory=/tmp/rocket-%(bundle)s' % env, pty=True)
-			
-				if scripts:
-					run('chmod +x %(bundle_path)s/SCRIPTS/*' % locals())
-					for script in scripts:
-						run('%(bundle_path)s/SCRIPTS/%(script)s' % locals(), pty=True)
-						os.remove(os.path.join('SCRIPTS', script))
+			put('/tmp/rocket-%(secret)s.tar.gz' % env, '/tmp/rocket-%(secret2)s.tar.gz' % env)
+			run('mkdir -p /tmp/rocket-%(bundle)s' % env, pty=True)
+			run('tar xzf /tmp/rocket-%(secret2)s.tar.gz --no-overwrite-dir --directory=/tmp/rocket-%(bundle)s' % env, pty=True)
+		
+			if scripts:
+				run('chmod +x %(bundle_path)s/SCRIPTS/*' % locals(), pty=True)
+				for script in scripts:
+					run('%(bundle_path)s/SCRIPTS/%(script)s' % locals(), pty=True)
+					os.remove(os.path.join(dump_path, 'SCRIPTS', script))
 		finally:
 			with hide('running', 'stdout', 'stderr'):
 				run('rm -rf /tmp/rocket-%(secret2)s.tar.gz' % locals())

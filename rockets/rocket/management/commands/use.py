@@ -16,9 +16,9 @@ class Command(BaseCommand):
 			nodes = models.Node.objects.all().order_by('name')
 			for node in nodes:
 				if node == selected_node:
-					self.stdout.write("%s [selected]\n" % node.name)
+					self.stdout.write("* %s\n" % node.name)
 				else:
-					self.stdout.write("%s\n" % node.name)
+					self.stdout.write("  %s\n" % node.name)
 		else:
 			node_name = args[0]
 			try:

@@ -152,7 +152,9 @@ class BaseService(forms.Form):
 		self.deploy(template, context=context)
 		self._plugins = []
 		self.plugins()
+		print self._plugins
 		for (package, plugin_template) in self._plugins:
+			print 'check', package, self.name
 			if self.node.installed(package, self.name):
 				self.deploy(plugin_template, context=context)
 	

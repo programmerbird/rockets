@@ -40,6 +40,8 @@ PACK_EFILE () {
 
 {% if rocket_links %}
 # symbolic links
+{% for source,target in rocket_links %}rm -f "{{target}}"
+{% endfor %}
 {% for source,target in rocket_links %}ln -s "{{source}}" "{{target}}"
 {% endfor %}
 {% endif %}
