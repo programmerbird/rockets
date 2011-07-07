@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+mkdir -p /home/{{name}}/{{name}}.git
 cd /home/{{name}}/{{name}}.git
 git init --bare 
 

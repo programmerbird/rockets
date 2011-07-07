@@ -5,6 +5,8 @@ version:
 	
 test:
 	# make local
+	mkdir -p tests
+	virtualenv --no-site-packages tests/.rockets
 	grep -v "egg=Rocket" rockets/bin/rocket2 > env/bin/rocket2
 	chmod +x env/bin/rocket2
 

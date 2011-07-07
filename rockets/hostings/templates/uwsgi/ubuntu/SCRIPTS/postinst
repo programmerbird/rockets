@@ -14,6 +14,7 @@ virtualenv --no-site-packages /home/{{name}}/env
 
 chmod +x /etc/init.d/uwsgi-{{name}}
 chown -R {{name}}:{{name}} $APP_PATH
+chown -R {{name}}:{{name}} /home/{{name}}/env
 
 update-rc.d uwsgi-{{name}} defaults
 
